@@ -1,12 +1,13 @@
 
 package Lógica;
+import java.io.Serializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 
 import java.util.Random;
 
-public class MiGridPane extends GridPane  {
+public class MiGridPane extends GridPane implements Serializable {
     private static final int GRID_SIZE_X = 10;
     private static final int GRID_SIZE_Y = 10;
 
