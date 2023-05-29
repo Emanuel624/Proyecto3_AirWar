@@ -20,6 +20,9 @@ import javafx.stage.Stage;
 
 import javafx.geometry.Insets;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 
 
 public class JuegoLógica extends Stage {
@@ -73,13 +76,16 @@ public class JuegoLógica extends Stage {
     }
     
     
-    //Crear la matriz del GUI para crear los diferentes datos.
     private GridPane createGridPane() {
         GridPane gridPane = new GridPane();
         gridPane.setPadding(new Insets(15));
         gridPane.setHgap(15);
         gridPane.setVgap(5);
         gridPane.setOpacity(1); // Establecer la opacidad del GridPane en 1 para que sea visible
+
+        Pane container = new Pane(); // Contenedor para las líneas
+        container.setMouseTransparent(true); // Hacer el contenedor transparente a los eventos de ratón
+        container.setOpacity(1);
 
         gridButtons = new Button[GRID_SIZE_X][GRID_SIZE_Y];
         String[][] gridData = new String[GRID_SIZE_X][GRID_SIZE_Y]; // Matriz adicional para almacenar los valores
@@ -101,10 +107,12 @@ public class JuegoLógica extends Stage {
 
                 final int finalRow = row; // Declarar una variable final para row
                 final int finalCol = col; // Declarar una variable final para col
-                button.setOnAction(e -> buttonClickedLeft(finalRow, finalCol)); // Usar las variables finales en la expresión lambda
+
+                // Establecer el evento de clic en el botón
+                button.setOnMouseClicked(e -> buttonClickedLeft(finalRow, finalCol));
 
                 // Saber qué tipo de casilla es al generar el valor aleatorio.
-                if (random < 0.05) {
+                if (random < 0.03) {
                     if (esUbicacion) {
                         button.setStyle("-fx-background-color: transparent; -fx-text-fill: red; -fx-padding: 0;");
                         button.setText("X"); // Aeropuertos
@@ -117,12 +125,12 @@ public class JuegoLógica extends Stage {
                 } else {
                     gridData[row][col] = "*"; // Dejar vacío en la matriz de datos si no se generó un valor especial
                 }
-
                 // Establecer la opacidad del botón en 1 para que sea visible
                 button.setOpacity(1);
 
                 // Agregar el botón al GridPane
                 gridPane.add(button, col, row);
+
             }
         }
         // Imprimir la matriz de datos
@@ -133,11 +141,32 @@ public class JuegoLógica extends Stage {
             }
             System.out.println();
         }
-        createGraphFromGridData(gridData);
+        Grafo<String> grafo = createGraphFromGridData(gridData);
+        List<Coordenada> vertices = grafo.obtenerVertices();
+        for (Coordenada vertice : vertices) {
+            List<Coordenada> adyacentes = grafo.obtenerAdyacentes(vertice);
+            if (adyacentes != null && !adyacentes.isEmpty()) {
+                Button button1 = gridButtons[vertice.getX()][vertice.getY()];
+                for (Coordenada adyacente : adyacentes) {
+                    Button button2 = gridButtons[adyacente.getX()][adyacente.getY()];
+                    Line line = new Line();
+                    line.setStroke(Color.RED);
+                    line.setStrokeWidth(2);
+                    line.startXProperty().bind(button1.layoutXProperty().add(button1.widthProperty().divide(2)));
+                    line.startYProperty().bind(button1.layoutYProperty().add(button1.heightProperty().divide(2)));
+                    line.endXProperty().bind(button2.layoutXProperty().add(button2.widthProperty().divide(2)));
+                    line.endYProperty().bind(button2.layoutYProperty().add(button2.heightProperty().divide(2)));
+                    line.setMouseTransparent(true); // Hacer las líneas transparentes a los eventos de ratón
+                    container.getChildren().add(line); // Agregar la línea al contenedor
+                }
+            }
+        }
+
+        gridPane.getChildren().add(container); // Agregar el contenedor de líneas al GridPane
         return gridPane;
     }
-    
-    
+
+     
     private Grafo<String> createGraphFromGridData(String[][] gridData) {
         int rows = gridData.length;
         int cols = gridData[0].length;
@@ -159,11 +188,23 @@ public class JuegoLógica extends Stage {
                         for (int j = 0; j < cols; j++) {
                             String otherValue = gridData[i][j];
                             if ((otherValue.equals("X") || otherValue.equals("0")) && (i != row || j != col)) {
-                                // Generar un número aleatorio entre 0 y 1
+                                Coordenada destino = new Coordenada(i, j);
+                                double distancia = calcularDistancia(coordenada, destino, gridData);
+                                
+                                String edgeType = "InterOceánica"; // Default edge type
+                                if (TierraMar[row][col] && TierraMar[i][j]) {
+                                    edgeType = "Continental";
+                                }
+
+                                // Increase the weight if the destination node contains "0"
+                                if (otherValue.equals("0")) {
+                                    distancia += 10; // Increase the weight by 10 (adjust the value as needed)
+                                }
+
+                                // Generate a random number between 0 and 1
                                 double randomValue = random.nextDouble();
                                 if (randomValue < 0.5) {
-                                    Coordenada destino = new Coordenada(i, j);
-                                    grafo.agregarArista(coordenada, destino);
+                                    grafo.agregarArista(coordenada, destino, distancia, edgeType);
                                 }
                             }
                         }
@@ -172,12 +213,16 @@ public class JuegoLógica extends Stage {
             }
         }
 
-        // Imprimir el grafo
+        // Print the graph
         List<Coordenada> vertices = grafo.obtenerVertices();
         for (Coordenada vertice : vertices) {
-            List<Coordenada> adyacentes = grafo.obtenerAdyacentes(vertice);
-            if (adyacentes != null && !adyacentes.isEmpty()) {
-                System.out.println("Vertice: " + vertice + ", Adyacentes: " + adyacentes);
+            List<Arista<String>> aristas = grafo.obtenerAristas(vertice);
+            if (aristas != null && !aristas.isEmpty()) {
+                System.out.print("Vertice: (" + vertice.getX() + ", " + vertice.getY() + "), Conexiones: ");
+                for (Arista<String> arista : aristas) {
+                    System.out.print("(" + arista.getDestino().getX() + ", " + arista.getDestino().getY() + ", Peso: " + arista.getPeso() + ", Tipo: " + arista.getTipo() + ") ");
+                }
+                System.out.println();
             }
         }
 
@@ -186,8 +231,36 @@ public class JuegoLógica extends Stage {
 
 
     
+    
+    private double calcularDistancia(Coordenada origen, Coordenada destino, String[][] gridData) {
+        int x1 = origen.getX();
+        int y1 = origen.getY();
+        int x2 = destino.getX();
+        int y2 = destino.getY();
+
+        int deltaX = x2 - x1;
+        int deltaY = y2 - y1;
+
+        // Calcula la distancia utilizando la fórmula de distancia euclidiana
+        double distancia = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+        // Aumenta el peso si el destino tiene valor "0"
+        if (gridData[destino.getX()][destino.getY()].equals("0")) {
+            distancia += 0; // Aumenta el peso en 10 (puedes ajustar el valor según tus necesidades)
+        }
+
+        // Redondea la distancia al entero más cercano
+        double peso = Math.round(distancia);
+
+        return peso;
+    }
+
+
+
+
+    
     private void buttonClickedLeft(int row, int col) {
-        System.out.println("Button clicked: " + row + ", " + col);
+        System.out.println("Coordenadas del botón: (" + row + ", " + col + ")");
     }
     
          
