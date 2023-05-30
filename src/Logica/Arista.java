@@ -1,7 +1,9 @@
 
-package Lógica;
+package Logica;
 
-public class Arista<T> {
+import java.io.Serializable;
+
+public class Arista<T>  implements Serializable{
     private Coordenada origen;
     private Coordenada destino;
     private double peso;

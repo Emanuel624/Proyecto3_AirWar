@@ -1,5 +1,5 @@
 
-package Lógica;
+package Logica;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -49,6 +49,7 @@ public class JuegoLógica extends Stage {
     {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
     };
     
+    private Grafo<String> grafo;
     
     public JuegoLógica() throws IOException {
         // Configurar los elementos de la interfaz
@@ -77,6 +78,7 @@ public class JuegoLógica extends Stage {
     
     
     private GridPane createGridPane() {
+        
         GridPane gridPane = new GridPane();
         gridPane.setPadding(new Insets(15));
         gridPane.setHgap(15);
@@ -171,9 +173,21 @@ public class JuegoLógica extends Stage {
         int rows = gridData.length;
         int cols = gridData[0].length;
 
-        Grafo<String> grafo = new Grafo<>();
+        grafo = new Grafo<>();
 
         Random random = new Random();
+
+        // Definir coordenadas de América
+        int[] americaRows = {0,0,0,0,0,0,1,1,1,1,1,1,2,2,2,2,2,2,3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,6,6,6,6,6,6,7,7,7,7,7,7,8,8,8,8,8,8,9,9,9,9,9,9};
+        int[] americaCols = {0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5};
+        
+       // Definir coordenadas de Africa y Europa
+        int[] africaEuropaRows = {0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6,7,7,7,7,8,8,8,8,9,9,9,9};
+        int[] africaEuropaCols = {6,7,8,9,6,7,8,9,6,7,8,9,6,7,8,9,6,7,8,9,6,7,8,9,6,7,8,9,6,7,8,9,6,7,8,9,6,7,8,9}; 
+        
+        // Clasificar nodos específicos como "Asia y oceania"
+        int[] asiaOceaniaRows = {0,0,0,0,0,0,0,1,1,1,1,1,1,1,2,2,2,2,2,2,2,3,3,3,3,3,3,3,4,4,4,4,4,4,4,5,5,5,5,5,5,5,6,6,6,6,6,6,6,7,7,7,7,7,7,7,8,8,8,8,8,8,8,9,9,9,9,9,9,9}; // Filas de los nodos a clasificar como "América"
+        int[] asiaOceaniaCols = {10,11,12,13,14,15,16,10,11,12,13,14,15,16,10,11,12,13,14,15,16,10,11,12,13,14,15,16,10,11,12,13,14,15,16,10,11,12,13,14,15,16,10,11,12,13,14,15,16,10,11,12,13,14,15,16,10,11,12,13,14,15,16,10,11,12,13,14,15,16}; // Columnas de los nodos a clasificar como "América"
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
@@ -190,12 +204,19 @@ public class JuegoLógica extends Stage {
                             if ((otherValue.equals("X") || otherValue.equals("0")) && (i != row || j != col)) {
                                 Coordenada destino = new Coordenada(i, j);
                                 double distancia = calcularDistancia(coordenada, destino, gridData);
-                                
-                                String edgeType = "InterOceánica"; // Default edge type
-                                if (TierraMar[row][col] && TierraMar[i][j]) {
-                                    edgeType = "Continental";
-                                }
 
+                                String edgeType = "Interoceanica"; // Default edge type
+                                // Clasificar las aristas en tipo continental
+                                if (isContinentalAmerica(coordenada, destino, americaCols, americaRows)) {
+                                    edgeType = "ContinentalAmerica";
+                                }else if (isContinentalEuAfrica(coordenada, destino, africaEuropaCols, africaEuropaRows)) {
+                                    edgeType = "ContinentalEuAfrica";
+                                }else if (isContinentalAsiaOcea(coordenada, destino, asiaOceaniaCols, asiaOceaniaRows)) {
+                                    edgeType = "ContinentalAsiaOcea";
+                                }else{
+                                    distancia += 10; // Increase the weight by 10 (adjust the value as needed)
+                                }
+                                                              
                                 // Increase the weight if the destination node contains "0"
                                 if (otherValue.equals("0")) {
                                     distancia += 10; // Increase the weight by 10 (adjust the value as needed)
@@ -213,7 +234,7 @@ public class JuegoLógica extends Stage {
             }
         }
 
-        // Print the graph
+        //Imprimer el grafo en consola
         List<Coordenada> vertices = grafo.obtenerVertices();
         for (Coordenada vertice : vertices) {
             List<Arista<String>> aristas = grafo.obtenerAristas(vertice);
@@ -229,14 +250,89 @@ public class JuegoLógica extends Stage {
         return grafo;
     }
 
+    private boolean isContinentalAmerica(Coordenada origen, Coordenada destino, int[] americaRows, int[] americaCols) {
+        int origenRow = origen.getY();
+        int origenCol = origen.getX();
+        int destinoRow = destino.getY();
+        int destinoCol = destino.getX();
 
+        boolean origenEnAmerica = false;
+        boolean destinoEnAmerica = false;
+
+        for (int i = 0; i < americaCols.length; i++) {
+            if (origenRow == americaRows[i] && origenCol == americaCols[i]) {
+                origenEnAmerica = true;
+            }
+            if (destinoRow == americaRows[i] && destinoCol == americaCols[i]) {
+                destinoEnAmerica = true;
+            }
+
+            // Si se encontró una pareja de coordenadas en América, se puede salir del bucle
+            if (origenEnAmerica && destinoEnAmerica) {
+                break;
+            }
+        }
+
+        return (origenEnAmerica && destinoEnAmerica);
+    }
+   
+    private boolean isContinentalEuAfrica(Coordenada origen, Coordenada destino, int[] africaEuropaRows, int[] africaEuropaCols) {
+        int origenRow = origen.getY();
+        int origenCol = origen.getX();
+        int destinoRow = destino.getY();
+        int destinoCol = destino.getX();
+
+        boolean origenEnEuAfrica = false;
+        boolean destinoEnEuAfrica = false;
+
+        for (int i = 0; i < africaEuropaCols.length; i++) {
+            if (origenRow == africaEuropaRows[i] && origenCol == africaEuropaCols[i]) {
+                origenEnEuAfrica = true;
+            }
+                  
+            if (destinoRow == africaEuropaRows[i] && destinoCol == africaEuropaCols[i]) {
+                destinoEnEuAfrica = true;
+            }
+            
+            if (origenEnEuAfrica && destinoEnEuAfrica){
+                break;
+            }
+        }
+
+        return (origenEnEuAfrica && destinoEnEuAfrica);
+    }
     
-    
+    private boolean isContinentalAsiaOcea(Coordenada origen, Coordenada destino, int[] asiaOceaniaRows, int[] asiaOceaniaCols) {
+        int origenRow = origen.getY();
+        int origenCol = origen.getX();
+        int destinoRow = destino.getY();
+        int destinoCol = destino.getX();
+
+        boolean origenEnAsiaOcea = false;
+        boolean destinoEnAsiaOcea = false;
+
+        for (int i = 0; i < asiaOceaniaCols.length; i++) {
+            if (origenRow == asiaOceaniaRows[i] && origenCol == asiaOceaniaCols[i]) {
+                origenEnAsiaOcea = true;
+            }
+            if (destinoRow == asiaOceaniaRows[i] && destinoCol == asiaOceaniaCols[i]) {
+                destinoEnAsiaOcea = true;
+            }
+            
+            if (origenEnAsiaOcea && destinoEnAsiaOcea){
+                break;
+            }
+        }
+
+        return (origenEnAsiaOcea && destinoEnAsiaOcea);
+    }
+
+        
     private double calcularDistancia(Coordenada origen, Coordenada destino, String[][] gridData) {
-        int x1 = origen.getX();
-        int y1 = origen.getY();
-        int x2 = destino.getX();
-        int y2 = destino.getY();
+        int x1 = origen.getY();
+        int y1 = origen.getX();
+        int x2 = destino.getY();
+        int y2 = destino.getX();
 
         int deltaX = x2 - x1;
         int deltaY = y2 - y1;
@@ -255,15 +351,11 @@ public class JuegoLógica extends Stage {
         return peso;
     }
 
-
-
-
     
     private void buttonClickedLeft(int row, int col) {
         System.out.println("Coordenadas del botón: (" + row + ", " + col + ")");
     }
     
-         
     private void iniciarSocket() {
         try {
             // Crear el socket para conectarse al servidor
@@ -272,10 +364,13 @@ public class JuegoLógica extends Stage {
             // Crear el stream de salida para enviar la información al servidor
             out = new ObjectOutputStream(socket.getOutputStream());
 
+            // Enviar el grafo al servidor
+            out.writeObject(grafo);
+            out.flush();
 
             // Cerrar la conexión y el stream de salida
-            out.close();
-            socket.close();
+
+
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,8 +1,8 @@
 
 package Interfaces;
 
-import Lógica.ControladorServer; //Importar de otro packete una clase
-import Lógica.JuegoLógica; //Importar de otro packete una clase
+import Logica.ControladorServer; //Importar de otro packete una clase
+import Logica.JuegoLógica; //Importar de otro packete una clase
 import java.io.IOException;
 import javafx.application.Application;
 import javafx.stage.Stage;

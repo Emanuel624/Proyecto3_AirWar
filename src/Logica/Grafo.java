@@ -1,12 +1,13 @@
 
-package Lógica;
+package Logica;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Grafo<T> {
+public class Grafo<T> implements Serializable{
     private Map<Coordenada, List<Arista<T>>> adyacencia;
 
     public Grafo() {

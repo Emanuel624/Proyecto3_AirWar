@@ -1,7 +1,9 @@
 
-package Lógica;
+package Logica;
 
-public class Coordenada {
+import java.io.Serializable;
+
+public class Coordenada implements Serializable{
     private int row;
     private int col;
     

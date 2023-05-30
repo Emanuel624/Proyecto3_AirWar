@@ -1,5 +1,5 @@
 
-package Lógica;
+package Logica;
 import java.io.Serializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
