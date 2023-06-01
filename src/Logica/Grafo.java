@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Grafo<T> implements Serializable{
-    private Map<Coordenada, List<Arista<T>>> adyacencia;
+    private final Map<Coordenada, List<Arista<T>>> adyacencia;
 
     public Grafo() {
         adyacencia = new HashMap<>();
@@ -19,11 +19,7 @@ public class Grafo<T> implements Serializable{
     }
 
     public void agregarArista(Coordenada origen, Coordenada destino, double peso, String tipo) {
-        List<Arista<T>> adyacentes = adyacencia.get(origen);
-        if (adyacentes == null) {
-            adyacentes = new ArrayList<>();
-            adyacencia.put(origen, adyacentes);
-        }
+        List<Arista<T>> adyacentes = adyacencia.computeIfAbsent(origen, k -> new ArrayList<>());
         Arista<T> arista = new Arista<>(origen, destino, peso, tipo);
         adyacentes.add(arista);
     }

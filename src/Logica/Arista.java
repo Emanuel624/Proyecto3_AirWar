@@ -4,9 +4,9 @@ package Logica;
 import java.io.Serializable;
 
 public class Arista<T>  implements Serializable{
-    private Coordenada origen;
-    private Coordenada destino;
-    private double peso;
+    private final Coordenada origen;
+    private final Coordenada destino;
+    private final double peso;
     private String tipo; // Nuevo campo para almacenar el tipo de arista
 
     public Arista(Coordenada origen, Coordenada destino, double peso, String tipo) {

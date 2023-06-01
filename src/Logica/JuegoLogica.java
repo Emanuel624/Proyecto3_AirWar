@@ -7,36 +7,37 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.List;
 import java.util.Random;
+
+import Algoritmos.InsertionSort;
+import Aviones.Aviones;
+import Listas.ArrayLista;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundImage;
-import javafx.scene.layout.BackgroundPosition;
-import javafx.scene.layout.BackgroundRepeat;
-import javafx.scene.layout.BackgroundSize;
-import javafx.scene.layout.StackPane;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import javafx.geometry.Insets;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
 
-public class JuegoLógica extends Stage {
-    // Objetos necesarios para el funcionamiento de los sockets
-    private ObjectOutputStream out;
+public class JuegoLogica extends Stage {
     private ObjectInputStream in;
-    
+    private final Button[][] gridButtons = new Button[GRID_SIZE_X][GRID_SIZE_Y];
     private static final int GRID_SIZE_X = 10;
     private static final int GRID_SIZE_Y = 17;
-    private Button[][] gridButtons;
-    
-    
+
+    private final Aviones Stuka = new Aviones("Stuka",30,50);
+    private final Aviones P51 = new Aviones("P51",45,20);
+
+    private final Aviones BF109 = new Aviones("BF109",60,10);
+
     //Clasificar si el grid es tierra(true) o agua (false).
-    private boolean[][] TierraMar = {
+    private final boolean[][] TierraMar = {
     {false, false, false, true, true, true, true, false, false, true, true, true, true, false, false, false, false},
     {true, true, true, false, true, false, false, false, true, true, true, true, true, true, true, false, false},
     {false, true, true, true, false, false, false, true, true, true, true, true, true, true, true, false, false},
@@ -51,21 +52,22 @@ public class JuegoLógica extends Stage {
     
     private Grafo<String> grafo;
     
-    public JuegoLógica() throws IOException {
+    public JuegoLogica(Stage stage) throws IOException {
         // Configurar los elementos de la interfaz
         setTitle("Ventana del Juego");
         StackPane layout = new StackPane();
-        
-        GridPane gridPane = createGridPane();
-               
+        GridPane gridPane = createGridPane(stage);
+
         // Cargar la imagen de fondo
-        Image imagenFondo = new Image("file:///C:/Users/Extreme PC/Desktop/Proyecto3_AirWar/MapaMundoProyecto3.png");
+        Image imagenFondo = new Image("file:D:\\TEC\\Datos I\\Proyecto\\Proyecto3_AirWar\\MapaMundoProyecto3.png");
         BackgroundSize backgroundSize = new BackgroundSize(1.0, 1.0, false, true, true, true);
         BackgroundImage fondo = new BackgroundImage(imagenFondo, BackgroundRepeat.NO_REPEAT,
                 BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, backgroundSize);
         layout.setBackground(new Background(fondo));
+
         layout.getChildren().addAll(gridPane);
-        
+
+
         
         // Crear una escena y asignarla al escenario
         Scene scene = new Scene(layout, 1550, 800);
@@ -74,44 +76,47 @@ public class JuegoLógica extends Stage {
         // Iniciar el socket en un nuevo hilo
         Thread socketThread = new Thread(this::iniciarSocket);
         socketThread.start();
+
+
     }
     
     
-    private GridPane createGridPane() {
-        
+    private GridPane createGridPane(Stage stage1) {
+
         GridPane gridPane = new GridPane();
         gridPane.setPadding(new Insets(15));
         gridPane.setHgap(15);
         gridPane.setVgap(5);
         gridPane.setOpacity(1); // Establecer la opacidad del GridPane en 1 para que sea visible
-
         Pane container = new Pane(); // Contenedor para las líneas
         container.setMouseTransparent(true); // Hacer el contenedor transparente a los eventos de ratón
         container.setOpacity(1);
-
-        gridButtons = new Button[GRID_SIZE_X][GRID_SIZE_Y];
         String[][] gridData = new String[GRID_SIZE_X][GRID_SIZE_Y]; // Matriz adicional para almacenar los valores
 
         for (int row = 0; row < GRID_SIZE_X; row++) {
             for (int col = 0; col < GRID_SIZE_Y; col++) {
                 Button button = new Button();
                 gridButtons[row][col] = button;
-
                 // Configurar estilo y acción para los botones
                 button.setMinSize(75, 75);
                 button.setMaxSize(75, 75);
                 button.setStyle("-fx-background-color: transparent; -fx-text-fill: red; -fx-padding: 0;");
-
-                boolean esUbicacion = TierraMar[row][col];
-
-                // Generar un número aleatorio entre 0 y 1
-                double random = Math.random();
-
+                //button.setUserData();
                 final int finalRow = row; // Declarar una variable final para row
                 final int finalCol = col; // Declarar una variable final para col
 
                 // Establecer el evento de clic en el botón
-                button.setOnMouseClicked(e -> buttonClickedLeft(finalRow, finalCol));
+                button.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+                    try {
+                        buttonOnClick(stage1, event, finalRow, finalCol);
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex);
+                    }
+                });
+                boolean esUbicacion = TierraMar[row][col];
+
+                // Generar un número aleatorio entre 0 y 1
+                double random = Math.random();
 
                 // Saber qué tipo de casilla es al generar el valor aleatorio.
                 if (random < 0.03) {
@@ -167,8 +172,57 @@ public class JuegoLógica extends Stage {
         gridPane.getChildren().add(container); // Agregar el contenedor de líneas al GridPane
         return gridPane;
     }
+    /*
+    private boolean isAirportOrCarrier (){
+        for (int row = 0; row < GRID_SIZE_X; row++) {
+            for (int col = 0; col < GRID_SIZE_Y; col++) {
+                if (gridButtons[row][col].getText().equals("X") || gridButtons[row][col].getText().equals("0")){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
-     
+     */
+    private void buttonOnClick(Stage stage, MouseEvent event, int row, int col) throws Exception {
+        if (event.getButton() == MouseButton.SECONDARY && (gridButtons[row][col].getText().equals("X") ||
+                gridButtons[row][col].getText().equals("0"))){
+            ListView<String> listViewAviones = new ListView<>();
+            listViewAviones.getItems().addAll(Stuka.nombre(), P51.nombre(), BF109.nombre());
+
+            Button btnVelocidad = new Button("Velocidad");
+            Button btnFortaleza = new Button("Fortaleza");
+            VBox vbox = new VBox(listViewAviones, btnVelocidad, btnFortaleza);
+
+            btnVelocidad.setOnAction(event1 -> {
+                    handleBtnVelocidad(listViewAviones);
+            });
+            btnFortaleza.setOnAction(event2 -> {
+                //handleBtnFortaleza();
+            });
+            HBox hbox = new HBox(vbox);
+
+            stage.setScene(new Scene(hbox, 300, 200));
+
+            stage.show();
+        }
+    }
+    private void handleBtnVelocidad (ListView<String> listViewAviones){
+        ArrayLista<Aviones> array = new ArrayLista<Aviones>();
+        array.add(Stuka);
+        array.add(P51);
+        array.add(BF109);
+
+        int [] arr1 = {Stuka.velocidad(), P51.velocidad(), BF109.velocidad()};
+        InsertionSort.insertionSort(arr1);
+        //listViewAviones.getItems().setAll(arr1);
+        for (int num : arr1) {
+            System.out.print(num + " ");
+        }
+
+    }
+
     private Grafo<String> createGraphFromGridData(String[][] gridData) {
         int rows = gridData.length;
         int cols = gridData[0].length;
@@ -342,27 +396,25 @@ public class JuegoLógica extends Stage {
 
         // Aumenta el peso si el destino tiene valor "0"
         if (gridData[destino.getX()][destino.getY()].equals("0")) {
-            distancia += 0; // Aumenta el peso en 10 (puedes ajustar el valor según tus necesidades)
+            distancia += 0; // Aumenta el peso en 10
         }
 
         // Redondea la distancia al entero más cercano
-        double peso = Math.round(distancia);
 
-        return peso;
+        return (double) Math.round(distancia);
     }
 
     
-    private void buttonClickedLeft(int row, int col) {
-        System.out.println("Coordenadas del botón: (" + row + ", " + col + ")");
-    }
+
     
     private void iniciarSocket() {
         try {
             // Crear el socket para conectarse al servidor
-            Socket socket = new Socket("localhost", 8080);
+            Socket socket = new Socket("localhost", 8070);
 
             // Crear el stream de salida para enviar la información al servidor
-            out = new ObjectOutputStream(socket.getOutputStream());
+            // Objetos necesarios para el funcionamiento de los sockets
+            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
 
             // Enviar el grafo al servidor
             out.writeObject(grafo);
