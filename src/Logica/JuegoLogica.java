@@ -5,12 +5,18 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import Algoritmos.InsertionSort;
 import Aviones.Aviones;
 import Listas.ArrayLista;
+import Listas.ListaEnlazada;
+import Listas.ListaEnlazadaView;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
@@ -33,8 +39,10 @@ public class JuegoLogica extends Stage {
 
     private final Aviones Stuka = new Aviones("Stuka",30,50);
     private final Aviones P51 = new Aviones("P51",45,20);
-
     private final Aviones BF109 = new Aviones("BF109",60,10);
+    private final Aviones JU88 = new Aviones("JU88",40,60);
+    private final Aviones Spitfire = new Aviones("Spitfire", 70,20);
+    private final Aviones Hurricane = new Aviones("Hurricane",75,15);
 
     //Clasificar si el grid es tierra(true) o agua (false).
     private final boolean[][] TierraMar = {
@@ -184,12 +192,29 @@ public class JuegoLogica extends Stage {
         return false;
     }
 
+
      */
+    private ListaEnlazada<Aviones> ListaAviones(){
+        ListaEnlazada<Aviones> listaEnlazadaAviones = new ListaEnlazada<>();
+        listaEnlazadaAviones.add(Stuka);
+        listaEnlazadaAviones.add(P51);
+        listaEnlazadaAviones.add(BF109);
+        listaEnlazadaAviones.add(JU88);
+        listaEnlazadaAviones.add(Spitfire);
+        listaEnlazadaAviones.add(Hurricane);
+    return listaEnlazadaAviones;
+    }
     private void buttonOnClick(Stage stage, MouseEvent event, int row, int col) throws Exception {
         if (event.getButton() == MouseButton.SECONDARY && (gridButtons[row][col].getText().equals("X") ||
                 gridButtons[row][col].getText().equals("0"))){
+
+
+            ListaEnlazada<Aviones> listaEnlazadaAviones1 = ListaAviones();
+
             ListView<String> listViewAviones = new ListView<>();
-            listViewAviones.getItems().addAll(Stuka.nombre(), P51.nombre(), BF109.nombre());
+            for (Aviones avion : listaEnlazadaAviones1) {
+                listViewAviones.getItems().add(avion.nombre());
+            }
 
             Button btnVelocidad = new Button("Velocidad");
             Button btnFortaleza = new Button("Fortaleza");
@@ -208,19 +233,17 @@ public class JuegoLogica extends Stage {
             stage.show();
         }
     }
+
     private void handleBtnVelocidad (ListView<String> listViewAviones){
-        ArrayLista<Aviones> array = new ArrayLista<Aviones>();
-        array.add(Stuka);
-        array.add(P51);
-        array.add(BF109);
-
-        int [] arr1 = {Stuka.velocidad(), P51.velocidad(), BF109.velocidad()};
-        InsertionSort.insertionSort(arr1);
-        //listViewAviones.getItems().setAll(arr1);
-        for (int num : arr1) {
-            System.out.print(num + " ");
+        ListaEnlazada<Aviones> listaAviones = ListaAviones();
+        int[] arrayVelocidades = new int[listaAviones.size()];
+        int index = 0;
+        for (Aviones avion : listaAviones) {
+            int velocidad = avion.velocidad();
+            arrayVelocidades[index] = velocidad;
+            index++;
         }
-
+        InsertionSort.insertionSort(arrayVelocidades);
     }
 
     private Grafo<String> createGraphFromGridData(String[][] gridData) {

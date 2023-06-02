@@ -13,7 +13,7 @@ import java.util.NoSuchElementException;
      * @version 1.0
      * @param <C> este parametro permite añadir, modificar y eliminar elementos de la lista Enlazada.
      */
-    public class ListaEnlazada<C> implements Serializable {
+    public class ListaEnlazada<C> implements Iterable<C> {
 
         private NodeLista<C> head;
         private int size;
