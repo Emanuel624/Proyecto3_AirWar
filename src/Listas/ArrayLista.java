@@ -1,7 +1,5 @@
 package Listas;
 
-import Aviones.Aviones;
-
 import java.util.Arrays;
 
 /**
@@ -31,7 +29,7 @@ public class ArrayLista<E> {
      * El metodo add, permite añadir elementos al arrayLista.
      * @param e este parametro es la información que se decia añadir en dicha array Lista.
      */
-    public void add(Aviones e) {
+    public void add(int e) {
         if (size == elements.length) {
             ensureCapacity();
         }
@@ -45,5 +43,13 @@ public class ArrayLista<E> {
     private void ensureCapacity() {
         int newSize = elements.length * 2;
         elements = Arrays.copyOf(elements, newSize);
+    }
+
+    public E get(int index) {
+
+        return (E) elements[index];
+    }
+    public int size() {
+        return this.size;
     }
 }

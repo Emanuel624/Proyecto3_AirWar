@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
@@ -17,8 +18,10 @@ import Listas.ListaEnlazada;
 import Listas.ListaEnlazadaView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
@@ -194,6 +197,11 @@ public class JuegoLogica extends Stage {
 
 
      */
+
+    /**
+     * metodo que se encarga de insertar los aviones en una lista y devolverla
+     * @return la lista con los aviones
+     */
     private ListaEnlazada<Aviones> ListaAviones(){
         ListaEnlazada<Aviones> listaEnlazadaAviones = new ListaEnlazada<>();
         listaEnlazadaAviones.add(Stuka);
@@ -202,23 +210,54 @@ public class JuegoLogica extends Stage {
         listaEnlazadaAviones.add(JU88);
         listaEnlazadaAviones.add(Spitfire);
         listaEnlazadaAviones.add(Hurricane);
+
     return listaEnlazadaAviones;
     }
+
+    /**
+     * Funcion que se encarga de manejar la logica detras del ordenamiento
+     * @param stage la ventana
+     * @param event presionar un boton
+     * @param row fila de la matriz de botones
+     * @param col columna de la matriz de botones
+     * @throws Exception exception
+     */
     private void buttonOnClick(Stage stage, MouseEvent event, int row, int col) throws Exception {
         if (event.getButton() == MouseButton.SECONDARY && (gridButtons[row][col].getText().equals("X") ||
                 gridButtons[row][col].getText().equals("0"))){
 
-
             ListaEnlazada<Aviones> listaEnlazadaAviones1 = ListaAviones();
-
             ListView<String> listViewAviones = new ListView<>();
             for (Aviones avion : listaEnlazadaAviones1) {
                 listViewAviones.getItems().add(avion.nombre());
             }
+            listViewAviones.setMaxWidth(150);
+            listViewAviones.setMaxHeight(150);
+            /*
+            listViewAviones.getSelectionModel().selectedItemProperty().addListener
+                    ((observable, oldValue, newValue) -> {
+
+                if (newValue != null) {
+                    lblNombre.setText("Nombre: " + newValue.nombre());
+                    lblCalorias.setText("Calorías: " + newValue.getCantidadCalorias());
+                    lblPrecio.setText("Precio: " + newValue.getPrecio());
+                    lblTiempoPreparacion.setText("Tiempo de preparación: " + newValue.getTiempoPreparacion() + " segundos");
+                }
+            });
+
+             */
+            //alinear botones y label
+            Label lbl = new Label("Ordenar por");
+            lbl.setAlignment(Pos.CENTER);
 
             Button btnVelocidad = new Button("Velocidad");
             Button btnFortaleza = new Button("Fortaleza");
-            VBox vbox = new VBox(listViewAviones, btnVelocidad, btnFortaleza);
+            VBox vbox = new VBox(lbl, btnVelocidad, btnFortaleza);
+            vbox.setAlignment(Pos.TOP_RIGHT);
+            vbox.setSpacing(10);
+            vbox.setPadding(new Insets(30));
+
+            HBox hbox = new HBox(listViewAviones,vbox);
 
             btnVelocidad.setOnAction(event1 -> {
                     handleBtnVelocidad(listViewAviones);
@@ -226,7 +265,7 @@ public class JuegoLogica extends Stage {
             btnFortaleza.setOnAction(event2 -> {
                 //handleBtnFortaleza();
             });
-            HBox hbox = new HBox(vbox);
+
 
             stage.setScene(new Scene(hbox, 300, 200));
 
@@ -234,16 +273,42 @@ public class JuegoLogica extends Stage {
         }
     }
 
-    private void handleBtnVelocidad (ListView<String> listViewAviones){
+    /**
+     * metodo que permite organizar loas aviones en la listView por su velocidad
+     * @param listViewAviones la listView con los aviones
+     */
+    private void handleBtnVelocidad (ListView<String> listViewAviones) {
         ListaEnlazada<Aviones> listaAviones = ListaAviones();
-        int[] arrayVelocidades = new int[listaAviones.size()];
-        int index = 0;
-        for (Aviones avion : listaAviones) {
-            int velocidad = avion.velocidad();
-            arrayVelocidades[index] = velocidad;
-            index++;
+        ArrayLista<Integer> arrayVelocidades = new ArrayLista<>();
+
+        for (Aviones aviones : listaAviones) {
+            arrayVelocidades.add(aviones.velocidad());
         }
-        InsertionSort.insertionSort(arrayVelocidades);
+        //crear un int [] para almacenar las velocidades
+        int[] arrayVelocidades2 = new int[arrayVelocidades.size()];
+        for (int i = 0; i < arrayVelocidades.size(); i++) {
+            arrayVelocidades2[i] = arrayVelocidades.get(i);
+        }
+        //ordenar las velocidades del int[] con insertion sort
+        InsertionSort.insertionSort(arrayVelocidades2);
+
+        //
+        ObservableList<Aviones> avionesOrdenados = FXCollections.observableArrayList();
+        for (int velocidad : arrayVelocidades2) {
+            for (Aviones avion : listaAviones) {
+                if (avion.velocidad() == velocidad) {
+                    avionesOrdenados.add(avion);
+                    break;
+                }
+            }
+        }
+        listViewAviones.getItems().clear();
+        for (Aviones avion :avionesOrdenados) {
+            listViewAviones.getItems().add(avion.nombre());
+        }
+    }
+    private void handleBtnFortaleza (){
+
     }
 
     private Grafo<String> createGraphFromGridData(String[][] gridData) {
