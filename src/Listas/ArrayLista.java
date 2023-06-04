@@ -12,7 +12,7 @@ import java.util.Arrays;
  * Esta clase publica, se relaciona con la implementación desde 0, de la estructura lineal "ArrayList" ademas de ser serializable para ser enviada por sockets.
  * @param <E> permite añadir, modificar o eliminar elementos a la clase ArrayList
  */
-public class ArrayLista<E> {
+public class ArrayLista<E>  {
     private transient int size = 0;
     private static final int DEFAULT_CAPACITY = 10;
     private Object[] elements;

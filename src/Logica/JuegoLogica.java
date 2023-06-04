@@ -12,10 +12,11 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import Algoritmos.InsertionSort;
+import Algoritmos.ShellSort;
 import Aviones.Aviones;
 import Listas.ArrayLista;
 import Listas.ListaEnlazada;
-import Listas.ListaEnlazadaView;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
@@ -33,9 +34,13 @@ import javafx.geometry.Insets;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
+import static java.lang.System.out;
+
 
 public class JuegoLogica extends Stage {
     private ObjectInputStream in;
+
+    private ObjectOutputStream out1;
     private final Button[][] gridButtons = new Button[GRID_SIZE_X][GRID_SIZE_Y];
     private static final int GRID_SIZE_X = 10;
     private static final int GRID_SIZE_Y = 17;
@@ -46,6 +51,8 @@ public class JuegoLogica extends Stage {
     private final Aviones JU88 = new Aviones("JU88",40,60);
     private final Aviones Spitfire = new Aviones("Spitfire", 70,20);
     private final Aviones Hurricane = new Aviones("Hurricane",75,15);
+
+    private final Aviones YAK9 = new Aviones("YAK9",40,35);
 
     //Clasificar si el grid es tierra(true) o agua (false).
     private final boolean[][] TierraMar = {
@@ -62,6 +69,28 @@ public class JuegoLogica extends Stage {
     };
     
     private Grafo<String> grafo;
+
+
+    private void iniciarSocket() {
+        try {
+            // Crear el socket para conectarse al servidor
+            Socket socket = new Socket("localhost", 8070);
+
+            // Crear el stream de salida para enviar la información al servidor
+            // Objetos necesarios para el funcionamiento de los sockets
+            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+
+            // Enviar el grafo al servidor
+            out.writeObject(grafo);
+            out.flush();
+
+            // Cerrar la conexión y el stream de salida
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     
     public JuegoLogica(Stage stage) throws IOException {
         // Configurar los elementos de la interfaz
@@ -152,12 +181,12 @@ public class JuegoLogica extends Stage {
             }
         }
         // Imprimir la matriz de datos
-        System.out.println("Matriz de datos:");
+        out.println("Matriz de datos:");
         for (String[] row : gridData) {
             for (String value : row) {
-                System.out.print(value + " ");
+                out.print(value + " ");
             }
-            System.out.println();
+            out.println();
         }
         Grafo<String> grafo = createGraphFromGridData(gridData);
         List<Coordenada> vertices = grafo.obtenerVertices();
@@ -183,25 +212,8 @@ public class JuegoLogica extends Stage {
         gridPane.getChildren().add(container); // Agregar el contenedor de líneas al GridPane
         return gridPane;
     }
-    /*
-    private boolean isAirportOrCarrier (){
-        for (int row = 0; row < GRID_SIZE_X; row++) {
-            for (int col = 0; col < GRID_SIZE_Y; col++) {
-                if (gridButtons[row][col].getText().equals("X") || gridButtons[row][col].getText().equals("0")){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
 
-     */
-
-    /**
-     * metodo que se encarga de insertar los aviones en una lista y devolverla
-     * @return la lista con los aviones
-     */
     private ListaEnlazada<Aviones> ListaAviones(){
         ListaEnlazada<Aviones> listaEnlazadaAviones = new ListaEnlazada<>();
         listaEnlazadaAviones.add(Stuka);
@@ -210,8 +222,9 @@ public class JuegoLogica extends Stage {
         listaEnlazadaAviones.add(JU88);
         listaEnlazadaAviones.add(Spitfire);
         listaEnlazadaAviones.add(Hurricane);
+        listaEnlazadaAviones.add(YAK9);
 
-    return listaEnlazadaAviones;
+        return listaEnlazadaAviones;
     }
 
     /**
@@ -260,10 +273,15 @@ public class JuegoLogica extends Stage {
             HBox hbox = new HBox(listViewAviones,vbox);
 
             btnVelocidad.setOnAction(event1 -> {
-                    handleBtnVelocidad(listViewAviones);
+                    handleBtnVelocidad();
+                try {
+                    handleServerMessages(listViewAviones);
+                } catch (IOException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
             });
             btnFortaleza.setOnAction(event2 -> {
-                //handleBtnFortaleza();
+                //handleBtnFortaleza(listViewAviones);
             });
 
 
@@ -275,40 +293,40 @@ public class JuegoLogica extends Stage {
 
     /**
      * metodo que permite organizar loas aviones en la listView por su velocidad
-     * @param listViewAviones la listView con los aviones
      */
-    private void handleBtnVelocidad (ListView<String> listViewAviones) {
-        ListaEnlazada<Aviones> listaAviones = ListaAviones();
-        ArrayLista<Integer> arrayVelocidades = new ArrayLista<>();
+    private void handleBtnVelocidad (){
+        try {
+            out1.writeObject("velocidad");
+        }catch (IOException e){
+            e.printStackTrace();
+        }
 
-        for (Aviones aviones : listaAviones) {
-            arrayVelocidades.add(aviones.velocidad());
-        }
-        //crear un int [] para almacenar las velocidades
-        int[] arrayVelocidades2 = new int[arrayVelocidades.size()];
-        for (int i = 0; i < arrayVelocidades.size(); i++) {
-            arrayVelocidades2[i] = arrayVelocidades.get(i);
-        }
-        //ordenar las velocidades del int[] con insertion sort
-        InsertionSort.insertionSort(arrayVelocidades2);
-
-        //
-        ObservableList<Aviones> avionesOrdenados = FXCollections.observableArrayList();
-        for (int velocidad : arrayVelocidades2) {
-            for (Aviones avion : listaAviones) {
-                if (avion.velocidad() == velocidad) {
-                    avionesOrdenados.add(avion);
-                    break;
-                }
-            }
-        }
-        listViewAviones.getItems().clear();
-        for (Aviones avion :avionesOrdenados) {
-            listViewAviones.getItems().add(avion.nombre());
-        }
     }
     private void handleBtnFortaleza (){
+        try {
+            out1.writeObject("fortaleza");
+        }catch (IOException e){
+            e.printStackTrace();
+        }
 
+    }
+    private void handleBtnNombre (){
+        try {
+            out1.writeObject("nombre");
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+    private void handleServerMessages (ListView<String> listViewAviones) throws IOException, ClassNotFoundException {
+        Object obj = in.readObject();
+
+        if (obj instanceof ObservableList){
+            ObservableList<Aviones> avionesOrdenadosVelocidad = (ObservableList<Aviones>) obj;
+            listViewAviones.getItems().clear();
+            for (Aviones avion :avionesOrdenadosVelocidad) {
+                listViewAviones.getItems().add(avion.nombre());
+            }
+        }
     }
 
     private Grafo<String> createGraphFromGridData(String[][] gridData) {
@@ -381,11 +399,11 @@ public class JuegoLogica extends Stage {
         for (Coordenada vertice : vertices) {
             List<Arista<String>> aristas = grafo.obtenerAristas(vertice);
             if (aristas != null && !aristas.isEmpty()) {
-                System.out.print("Vertice: (" + vertice.getX() + ", " + vertice.getY() + "), Conexiones: ");
+                out.print("Vertice: (" + vertice.getX() + ", " + vertice.getY() + "), Conexiones: ");
                 for (Arista<String> arista : aristas) {
-                    System.out.print("(" + arista.getDestino().getX() + ", " + arista.getDestino().getY() + ", Peso: " + arista.getPeso() + ", Tipo: " + arista.getTipo() + ") ");
+                    out.print("(" + arista.getDestino().getX() + ", " + arista.getDestino().getY() + ", Peso: " + arista.getPeso() + ", Tipo: " + arista.getTipo() + ") ");
                 }
-                System.out.println();
+                out.println();
             }
         }
 
@@ -495,26 +513,7 @@ public class JuegoLogica extends Stage {
     
 
     
-    private void iniciarSocket() {
-        try {
-            // Crear el socket para conectarse al servidor
-            Socket socket = new Socket("localhost", 8070);
 
-            // Crear el stream de salida para enviar la información al servidor
-            // Objetos necesarios para el funcionamiento de los sockets
-            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-
-            // Enviar el grafo al servidor
-            out.writeObject(grafo);
-            out.flush();
-
-            // Cerrar la conexión y el stream de salida
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
 
     public void display() {

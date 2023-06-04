@@ -5,10 +5,18 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import Algoritmos.InsertionSort;
+import Algoritmos.ShellSort;
+import Aviones.Aviones;
+import Listas.ArrayLista;
+import Listas.ListaEnlazada;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -24,6 +32,32 @@ import javafx.scene.control.TextArea;
 public class ControladorServer extends Stage {
 
     private static Socket socket;
+
+    private final Aviones Stuka = new Aviones("Stuka",30,50);
+    private final Aviones P51 = new Aviones("P51",45,20);
+    private final Aviones BF109 = new Aviones("BF109",60,10);
+    private final Aviones JU88 = new Aviones("JU88",40,60);
+    private final Aviones Spitfire = new Aviones("Spitfire", 70,20);
+    private final Aviones Hurricane = new Aviones("Hurricane",75,15);
+
+    private final Aviones YAK9 = new Aviones("YAK9",40,35);
+
+    /**
+     * metodo que se encarga de insertar los aviones en una lista y devolverla
+     * @return la lista con los aviones
+     */
+    private ListaEnlazada<Aviones> ListaAviones(){
+        ListaEnlazada<Aviones> listaEnlazadaAviones = new ListaEnlazada<>();
+        listaEnlazadaAviones.add(Stuka);
+        listaEnlazadaAviones.add(P51);
+        listaEnlazadaAviones.add(BF109);
+        listaEnlazadaAviones.add(JU88);
+        listaEnlazadaAviones.add(Spitfire);
+        listaEnlazadaAviones.add(Hurricane);
+        listaEnlazadaAviones.add(YAK9);
+
+        return listaEnlazadaAviones;
+    }
 
     public ControladorServer() throws IOException {
         Button button = new Button("¿Hago algo?");
@@ -58,12 +92,64 @@ public class ControladorServer extends Stage {
                         ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
                         // Crear el stream de salida para enviar la respuesta al cliente
                         ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+                        while (true){
+                            Object obj = in.readObject();
+                            if (obj instanceof Grafo grafoRecibido){
+                                System.out.println(grafoRecibido);
+                                // Actualizar el TextArea en el hilo de la interfaz de usuario
 
-                        // Recibir el grafo del cliente
-                        Grafo grafoRecibido = (Grafo) in.readObject();
-                        System.out.println(grafoRecibido);
+                            } else if (obj instanceof String && obj.equals("velocidad")) {
+                                ListaEnlazada<Aviones> listaAviones = ListaAviones();
+                                ArrayLista<Integer> arrayVelocidades = new ArrayLista<>();
 
-                        // Actualizar el TextArea en el hilo de la interfaz de usuario
+                                for (Aviones aviones : listaAviones) {
+                                    arrayVelocidades.add(aviones.velocidad());
+                                }
+                                //crear un int [] para almacenar las velocidades
+                                int[] arrayVelocidades2 = new int[arrayVelocidades.size()];
+                                for (int i = 0; i < arrayVelocidades.size(); i++) {
+                                    arrayVelocidades2[i] = arrayVelocidades.get(i);
+                                }
+                                //ordenar las velocidades del int[] con insertion sort
+                                InsertionSort.insertionSort(arrayVelocidades2);
+
+                                //
+                                ObservableList<Aviones> avionesOrdenadosVelocidad = FXCollections.observableArrayList();
+                                for (int velocidad : arrayVelocidades2) {
+                                    for (Aviones avion : listaAviones) {
+                                        if (avion.velocidad() == velocidad) {
+                                            avionesOrdenadosVelocidad.add(avion);
+                                            break;
+                                        }
+                                    }
+                                }
+                                 out.writeObject(avionesOrdenadosVelocidad);
+                            } else if (obj instanceof String && obj.equals("fortaleza")) {
+                                ListaEnlazada<Aviones> listaAviones = ListaAviones();
+                                ArrayLista<Integer> arrayFortalezas = new ArrayLista<>();
+
+                                for (Aviones aviones : listaAviones) {
+                                    arrayFortalezas.add(aviones.fortaleza());
+                                }
+                                //crear un int [] para almacenar las velocidades
+                                int[] arrayFortalezas2 = new int[arrayFortalezas.size()];
+                                for (int i = 0; i < arrayFortalezas.size(); i++) {
+                                    arrayFortalezas2[i] = arrayFortalezas.get(i);
+                                }
+                                //ordenar las fortalezas del int[] con shell sort
+                                ShellSort.shellSort(arrayFortalezas2);
+                                //
+                                ObservableList<Aviones> avionesOrdenadosFortaleza = FXCollections.observableArrayList();
+                                for (int fortaleza : arrayFortalezas2) {
+                                    for (Aviones avion : listaAviones) {
+                                        if (avion.fortaleza() == fortaleza) {
+                                            avionesOrdenadosFortaleza.add(avion);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -76,7 +162,6 @@ public class ControladorServer extends Stage {
             e.printStackTrace();
         }
     }
-    
     // Método para obtener la información específica del grafo
     private String obtenerInformacionGrafo(Grafo grafo) {
         StringBuilder sb = new StringBuilder();

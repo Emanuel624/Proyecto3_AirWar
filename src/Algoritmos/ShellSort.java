@@ -1,7 +1,7 @@
 package Algoritmos;
 
 public class ShellSort {
-    public void shellSort(int[] arrayToSort) {
+    public static void shellSort(int[] arrayToSort) {
         int n = arrayToSort.length;
 
         for (int gap = n / 2; gap > 0; gap /= 2) {
