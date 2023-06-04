@@ -5,18 +5,17 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
+import Algoritmos.BinarySearch;
 import Algoritmos.InsertionSort;
 import Algoritmos.ShellSort;
 import Aviones.Aviones;
 import Listas.ArrayLista;
 import Listas.ListaEnlazada;
 
+import Listas.ListaEnlazadaView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
@@ -24,6 +23,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -45,14 +45,14 @@ public class JuegoLogica extends Stage {
     private static final int GRID_SIZE_X = 10;
     private static final int GRID_SIZE_Y = 17;
 
-    private final Aviones Stuka = new Aviones("Stuka",30,50);
-    private final Aviones P51 = new Aviones("P51",45,20);
-    private final Aviones BF109 = new Aviones("BF109",60,10);
-    private final Aviones JU88 = new Aviones("JU88",40,60);
-    private final Aviones Spitfire = new Aviones("Spitfire", 70,20);
-    private final Aviones Hurricane = new Aviones("Hurricane",75,15);
+    private final Aviones Stuka = new Aviones("Stuka",30,4,50);
+    private final Aviones P51 = new Aviones("P51",45,1,40);
+    private final Aviones BF109 = new Aviones("BF109",60,3,10);
+    private final Aviones JU88 = new Aviones("JU88",40,5,60);
+    private final Aviones Spitfire = new Aviones("Spitfire", 70,5,20);
+    private final Aviones Hurricane = new Aviones("Hurricane",75,3,15);
 
-    private final Aviones YAK9 = new Aviones("YAK9",40,35);
+    private final Aviones YAK9 = new Aviones("YAK9",40,2,35);
 
     //Clasificar si el grid es tierra(true) o agua (false).
     private final boolean[][] TierraMar = {
@@ -238,85 +238,191 @@ public class JuegoLogica extends Stage {
     private void buttonOnClick(Stage stage, MouseEvent event, int row, int col) throws Exception {
         if (event.getButton() == MouseButton.SECONDARY && (gridButtons[row][col].getText().equals("X") ||
                 gridButtons[row][col].getText().equals("0"))){
-
+            //crear la listview y setear tamaño
+            ListaEnlazadaView<Aviones> listViewAviones = new ListaEnlazadaView<>();
             ListaEnlazada<Aviones> listaEnlazadaAviones1 = ListaAviones();
-            ListView<String> listViewAviones = new ListView<>();
-            for (Aviones avion : listaEnlazadaAviones1) {
-                listViewAviones.getItems().add(avion.nombre());
-            }
-            listViewAviones.setMaxWidth(150);
-            listViewAviones.setMaxHeight(150);
-            /*
-            listViewAviones.getSelectionModel().selectedItemProperty().addListener
-                    ((observable, oldValue, newValue) -> {
+            listaEnlazadaAviones1.forEach(listViewAviones::add);
 
-                if (newValue != null) {
-                    lblNombre.setText("Nombre: " + newValue.nombre());
-                    lblCalorias.setText("Calorías: " + newValue.getCantidadCalorias());
-                    lblPrecio.setText("Precio: " + newValue.getPrecio());
-                    lblTiempoPreparacion.setText("Tiempo de preparación: " + newValue.getTiempoPreparacion() + " segundos");
-                }
-            });
+            listViewAviones.getListView().setMaxWidth(200);
+            listViewAviones.getListView().setMaxHeight(200);
+            //crear labels donde se almacenan los atributos de los aviones
+            Label lblNombre = new Label("Nombre: ");
+            Label lblVelocidad = new Label("Velocidad: ");
+            Label lblEficiencia = new Label("Eficiencia: ");
+            Label lblFortaleza = new Label("Fortaleza: ");
 
-             */
-            //alinear botones y label
-            Label lbl = new Label("Ordenar por");
-            lbl.setAlignment(Pos.CENTER);
 
+            listViewAviones.getListView().getSelectionModel().selectedItemProperty().
+                    addListener((observable, oldValue, newValue) -> {
+                        if (newValue != null){
+                            lblNombre.setText("Nombre: " + newValue.getNombre());
+                            lblVelocidad.setText("Velocidad: " + newValue.getVelocidad());
+                            lblEficiencia.setText("Eficiencia: " + newValue.getEficiencia());
+                            lblFortaleza.setText("Fortaleza: " + newValue.getFortaleza());
+                        }
+                    });
+            VBox vboxLbls = new VBox(listViewAviones.getListView(), lblNombre, lblVelocidad,lblEficiencia,lblFortaleza);
+            vboxLbls.setSpacing(10);
+            vboxLbls.setPadding(new Insets(30));
+
+            //crear botones para el ordenamiento
+            Label lbl = new Label("Ordenar por:");
             Button btnVelocidad = new Button("Velocidad");
-            Button btnFortaleza = new Button("Fortaleza");
-            VBox vbox = new VBox(lbl, btnVelocidad, btnFortaleza);
-            vbox.setAlignment(Pos.TOP_RIGHT);
-            vbox.setSpacing(10);
-            vbox.setPadding(new Insets(30));
+            Button btnEficiencia = new Button("Eficiencia");
+            Label lbl2 = new Label("Busca por nombre");
+            lbl2.setAlignment(Pos.CENTER);
+            TextField txtNombre = new TextField();
+            txtNombre.setMaxWidth(100);
+            txtNombre.setAlignment(Pos.CENTER);
+            Button btnBuscar = new Button("Buscar");
+            btnBuscar.setAlignment(Pos.CENTER);
 
-            HBox hbox = new HBox(listViewAviones,vbox);
+            VBox vboxBtns = new VBox(lbl,btnVelocidad,btnEficiencia, lbl2, txtNombre, btnBuscar);
+            vboxBtns.setAlignment(Pos.TOP_CENTER);
+            vboxBtns.setSpacing(10);
+            vboxBtns.setPadding(new Insets(30));
 
+
+
+
+            HBox hbox = new HBox(vboxLbls, vboxBtns);
             btnVelocidad.setOnAction(event1 -> {
-                    handleBtnVelocidad();
-                try {
+                    handleBtnVelocidad(listViewAviones.getListView());
+                /*try {
                     handleServerMessages(listViewAviones);
                 } catch (IOException | ClassNotFoundException e) {
                     throw new RuntimeException(e);
                 }
+
+                 */
             });
-            btnFortaleza.setOnAction(event2 -> {
-                //handleBtnFortaleza(listViewAviones);
+            btnEficiencia.setOnAction(event2 -> {
+                handleBtnEficiencia(listViewAviones.getListView());
+            });
+            btnBuscar.setOnAction(event3 ->{
+                handleBtnNombre(txtNombre, listViewAviones.getListView());
             });
 
 
-            stage.setScene(new Scene(hbox, 300, 200));
+            stage.setScene(new Scene(hbox, 450, 420));
 
             stage.show();
-        }
-    }
+        }}
 
     /**
-     * metodo que permite organizar loas aviones en la listView por su velocidad
+     * metodo que permite organizar los aviones en la listView por su velocidad
      */
-    private void handleBtnVelocidad (){
+    private void handleBtnVelocidad (ListView<Aviones> listViewAviones){
+       /*
         try {
             out1.writeObject("velocidad");
         }catch (IOException e){
             e.printStackTrace();
         }
 
+        */
+        ListaEnlazada<Aviones> listaAviones = ListaAviones();
+        ArrayLista<Integer> arrayVelocidades = new ArrayLista<>();
+
+        for (Aviones aviones : listaAviones) {
+            arrayVelocidades.add(aviones.getVelocidad());
+        }
+        //crear un int [] para almacenar las velocidades
+        int[] arrayVelocidades2 = new int[arrayVelocidades.size()];
+        for (int i = 0; i < arrayVelocidades.size(); i++) {
+            arrayVelocidades2[i] = arrayVelocidades.get(i);
+        }
+        //ordenar las velocidades del int[] con insertion sort
+        InsertionSort.insertionSort(arrayVelocidades2);
+
+        //
+        ObservableList<Aviones> avionesOrdenadosVelocidad = FXCollections.observableArrayList();
+        for (int velocidad : arrayVelocidades2) {
+            for (Aviones avion : listaAviones) {
+                if (avion.getVelocidad() == velocidad) {
+                    avionesOrdenadosVelocidad.add(avion);
+                    break;
+                }
+            }
+            listViewAviones.getItems().clear();
+            for (Aviones avion :avionesOrdenadosVelocidad) {
+                listViewAviones.getItems().add(avion);
+            }
+        }
+        //out.writeObject(avionesOrdenadosVelocidad);
     }
-    private void handleBtnFortaleza (){
-        try {
+
+    private void handleBtnEficiencia (ListView<Aviones> listViewAviones){
+        /*try {
             out1.writeObject("fortaleza");
         }catch (IOException e){
             e.printStackTrace();
         }
 
+         */
+        ListaEnlazada<Aviones> listaAviones = ListaAviones();
+        ArrayLista<Integer> arrayEficiencias = new ArrayLista<>();
+
+        for (Aviones aviones : listaAviones) {
+            arrayEficiencias.add(aviones.getEficiencia());
+        }
+        //crear un int [] para almacenar las velocidades
+        int[] arrayEficiencias2 = new int[arrayEficiencias.size()];
+        for (int i = 0; i < arrayEficiencias.size(); i++) {
+            arrayEficiencias2[i] = arrayEficiencias.get(i);
+        }
+        //ordenar las fortalezas del int[] con shell sort
+        ShellSort.shellSort(arrayEficiencias2);
+        //
+        ObservableList<Aviones> avionesOrdenadosEficiencia = FXCollections.observableArrayList();
+        for (int eficiencia : arrayEficiencias2) {
+            for (Aviones avion : listaAviones) {
+                if (avion.getEficiencia() == eficiencia) {
+                    avionesOrdenadosEficiencia.add(avion);
+                    break;
+                }
+            }
+            listViewAviones.getItems().clear();
+            for (Aviones avion :avionesOrdenadosEficiencia) {
+                listViewAviones.getItems().add(avion);
+            }
+        }
     }
-    private void handleBtnNombre (){
-        try {
-            out1.writeObject("nombre");
+    private void handleBtnNombre (TextField txtNombre, ListView<Aviones> listViewAviones){
+        /*try {
+            out1.writeObject("buscarNombre");
         }catch (IOException e){
             e.printStackTrace();
         }
+
+         */
+        ListaEnlazada<Aviones> listaAviones = ListaAviones();
+        ArrayLista<String> arrayNombres = new ArrayLista<>();
+        String nombreBuscado = txtNombre.getText();
+        for (Aviones aviones : listaAviones) {
+            //arrayNombres.add(aviones.getNombre());
+        }
+        //crear un int [] para almacenar las velocidades
+        String[] arrayNombres2 = new String[arrayNombres.size()];
+        for (int i = 0; i < arrayNombres.size(); i++) {
+            arrayNombres2[i] = arrayNombres.get(i);
+        }
+        ObservableList<Aviones> avionesEncontrados= FXCollections.observableArrayList();
+            for (String nombre : arrayNombres2) {
+                for (Aviones avion : listaAviones) {
+                    int indice = BinarySearch.binarySearch(arrayNombres2, nombreBuscado);
+                    if (indice >= 0){
+                        avionesEncontrados.add(avion);
+                    }
+
+                }
+            }
+        listViewAviones.getItems().clear();;
+        for (Aviones avion :avionesEncontrados) {
+            listViewAviones.getItems().add(avion);
+        }
     }
+    /*
     private void handleServerMessages (ListView<String> listViewAviones) throws IOException, ClassNotFoundException {
         Object obj = in.readObject();
 
@@ -327,8 +433,10 @@ public class JuegoLogica extends Stage {
                 listViewAviones.getItems().add(avion.nombre());
             }
         }
-    }
 
+
+    }
+     */
     private Grafo<String> createGraphFromGridData(String[][] gridData) {
         int rows = gridData.length;
         int cols = gridData[0].length;
@@ -509,13 +617,6 @@ public class JuegoLogica extends Stage {
 
         return (double) Math.round(distancia);
     }
-
-    
-
-    
-
-
-
     public void display() {
         // Mostrar la interfaz
         show();
