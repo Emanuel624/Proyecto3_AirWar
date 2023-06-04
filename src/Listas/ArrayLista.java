@@ -14,7 +14,7 @@ import java.util.Arrays;
  */
 public class ArrayLista<E>  {
     private transient int size = 0;
-    private static final int DEFAULT_CAPACITY = 10;
+    private static final int DEFAULT_CAPACITY = 15;
     private Object[] elements;
 
     /**
@@ -35,8 +35,12 @@ public class ArrayLista<E>  {
         }
         elements[size++] = e;
     }
-
-
+    public void addString (String e){
+        if (size == elements.length){
+            ensureCapacity();
+        }
+        elements[size++] = e;
+    }
     /**
      * Este método se asegura de que la capacidad de la lista siempre sea la correcta.
      */

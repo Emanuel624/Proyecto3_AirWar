@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 import Algoritmos.BinarySearch;
@@ -13,6 +15,7 @@ import Algoritmos.InsertionSort;
 import Algoritmos.ShellSort;
 import Aviones.Aviones;
 import Listas.ArrayLista;
+import Listas.ArrayListaString;
 import Listas.ListaEnlazada;
 
 import Listas.ListaEnlazadaView;
@@ -49,10 +52,10 @@ public class JuegoLogica extends Stage {
     private final Aviones P51 = new Aviones("P51",45,1,40);
     private final Aviones BF109 = new Aviones("BF109",60,3,10);
     private final Aviones JU88 = new Aviones("JU88",40,5,60);
-    private final Aviones Spitfire = new Aviones("Spitfire", 70,5,20);
-    private final Aviones Hurricane = new Aviones("Hurricane",75,3,15);
+    private final Aviones Spitfire = new Aviones("Spitfire", 70,6,20);
+    private final Aviones Hurricane = new Aviones("Hurricane",75,7,15);
 
-    private final Aviones YAK9 = new Aviones("YAK9",40,2,35);
+    private final Aviones YAK9 = new Aviones("YAK9",41,2,35);
 
     //Clasificar si el grid es tierra(true) o agua (false).
     private final boolean[][] TierraMar = {
@@ -397,10 +400,10 @@ public class JuegoLogica extends Stage {
 
          */
         ListaEnlazada<Aviones> listaAviones = ListaAviones();
-        ArrayLista<String> arrayNombres = new ArrayLista<>();
+        ArrayListaString<String> arrayNombres = new ArrayListaString<>();
         String nombreBuscado = txtNombre.getText();
         for (Aviones aviones : listaAviones) {
-            //arrayNombres.add(aviones.getNombre());
+            arrayNombres.addString(aviones.getNombre());
         }
         //crear un int [] para almacenar las velocidades
         String[] arrayNombres2 = new String[arrayNombres.size()];
@@ -408,18 +411,20 @@ public class JuegoLogica extends Stage {
             arrayNombres2[i] = arrayNombres.get(i);
         }
         ObservableList<Aviones> avionesEncontrados= FXCollections.observableArrayList();
-            for (String nombre : arrayNombres2) {
-                for (Aviones avion : listaAviones) {
-                    int indice = BinarySearch.binarySearch(arrayNombres2, nombreBuscado);
-                    if (indice >= 0){
-                        avionesEncontrados.add(avion);
-                    }
-
+        int indice = BinarySearch.binarySearch(arrayNombres2, nombreBuscado);
+        if (indice >= 0){
+            String nombreEncontrado = arrayNombres2[indice];
+            for (Aviones avion : listaAviones) {
+                if (Objects.equals(avion.getNombre(), nombreEncontrado)) {
+                    avionesEncontrados.add(avion);
+                    break;
                 }
             }
         listViewAviones.getItems().clear();;
+        txtNombre.clear();
         for (Aviones avion :avionesEncontrados) {
             listViewAviones.getItems().add(avion);
+            }
         }
     }
     /*

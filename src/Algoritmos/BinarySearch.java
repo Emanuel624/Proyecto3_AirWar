@@ -10,7 +10,7 @@ public class BinarySearch {
             // Loop to implement Binary Search
             while (l <= r) {
 
-                // Calculatiing mid
+                // Calculating mid
                 int m = l + (r - l) / 2;
 
                 int res = x.compareTo(arr[m]);
