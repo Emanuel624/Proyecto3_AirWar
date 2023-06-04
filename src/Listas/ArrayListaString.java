@@ -7,7 +7,7 @@ public class ArrayListaString<E>  {
     private String[] elements;
 
     /**
-     * La clase publica de array list, permite aplicar esta clase, fuera de esta clase como tal.
+     * Clase ArrayListaString que crea un array de strings especificamente
      */
     public ArrayListaString() {
 
@@ -22,7 +22,7 @@ public class ArrayListaString<E>  {
         elements = Arrays.copyOf(elements, newSize);
     }
     /**
-     * El metodo add, permite añadir elementos al arrayLista.
+     * El metodo add, permite añadir elementos (strings) al arrayLista.
      * @param e este parametro es la información que se decia añadir en dicha array Lista.
      */
     public void addString(String e) {
@@ -31,10 +31,19 @@ public class ArrayListaString<E>  {
         }
         elements[size++] = e;
     }
+    /**
+     * metodo que devuelve el indice del array donde se encuentra un elemento
+     * @param index indice
+     * @return el indice donde se encuentra un elemento
+     */
     public E get(int index) {
 
         return (E) elements[index];
     }
+    /**
+     * metodo que accede al tamano del array
+     * @return el tamano
+     */
     public int size() {
         return this.size;
     }

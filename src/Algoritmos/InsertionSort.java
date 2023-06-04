@@ -1,5 +1,8 @@
 package Algoritmos;
 
+/**
+ * clase que permite usar insertionsort para ordenar un array de enteros
+ */
 public class InsertionSort {
     public static void insertionSort(int[] array) {
         int n = array.length;

@@ -1,5 +1,8 @@
 package Algoritmos;
 
+/**
+ * clase que se instancia para usar el algoritmo de ShellSort
+ */
 public class ShellSort {
     public static void shellSort(int[] arrayToSort) {
         int n = arrayToSort.length;

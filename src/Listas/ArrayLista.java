@@ -35,12 +35,6 @@ public class ArrayLista<E>  {
         }
         elements[size++] = e;
     }
-    public void addString (String e){
-        if (size == elements.length){
-            ensureCapacity();
-        }
-        elements[size++] = e;
-    }
     /**
      * Este método se asegura de que la capacidad de la lista siempre sea la correcta.
      */
@@ -49,10 +43,20 @@ public class ArrayLista<E>  {
         elements = Arrays.copyOf(elements, newSize);
     }
 
+    /**
+     * metodo que devuelve el indice del array donde se encuentra un elemento
+     * @param index indice
+     * @return el indice donde se encuentra un elemento
+     */
     public E get(int index) {
 
         return (E) elements[index];
     }
+
+    /**
+     * metodo que accede al tamano del array
+     * @return el tamano
+     */
     public int size() {
         return this.size;
     }

@@ -1,5 +1,8 @@
 package Aviones;
 
+/**
+ * clase con los atributos del objeto Aeropuerto
+ */
 public class Aeropuerto {
 
     private final int cantidadCombustible;

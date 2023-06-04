@@ -45,6 +45,8 @@ public class JuegoLogica extends Stage {
 
     private ObjectOutputStream out1;
     private final Button[][] gridButtons = new Button[GRID_SIZE_X][GRID_SIZE_Y];
+
+
     private static final int GRID_SIZE_X = 10;
     private static final int GRID_SIZE_Y = 17;
 
@@ -216,7 +218,10 @@ public class JuegoLogica extends Stage {
         return gridPane;
     }
 
-
+    /**
+     * metodo que guarda los aviones previamente definidos
+     * @return esa lista con los aviones
+     */
     private ListaEnlazada<Aviones> ListaAviones(){
         ListaEnlazada<Aviones> listaEnlazadaAviones = new ListaEnlazada<>();
         listaEnlazadaAviones.add(Stuka);
@@ -314,6 +319,7 @@ public class JuegoLogica extends Stage {
 
     /**
      * metodo que permite organizar los aviones en la listView por su velocidad
+     * @param listViewAviones la listView de aviones
      */
     private void handleBtnVelocidad (ListView<Aviones> listViewAviones){
        /*
@@ -355,6 +361,10 @@ public class JuegoLogica extends Stage {
         //out.writeObject(avionesOrdenadosVelocidad);
     }
 
+    /**
+     * Metodo que se encarga de ordenar la listView por la eficiencia
+     * @param listViewAviones la listView de aviones
+     */
     private void handleBtnEficiencia (ListView<Aviones> listViewAviones){
         /*try {
             out1.writeObject("fortaleza");
@@ -391,6 +401,12 @@ public class JuegoLogica extends Stage {
             }
         }
     }
+
+    /**
+     * Método que permite buscar por nombre de avion
+     * @param txtNombre el campo de texto de la ventana
+     * @param listViewAviones la listView de aviones
+     */
     private void handleBtnNombre (TextField txtNombre, ListView<Aviones> listViewAviones){
         /*try {
             out1.writeObject("buscarNombre");
@@ -522,7 +538,7 @@ public class JuegoLogica extends Stage {
 
         return grafo;
     }
-
+    //al parecer, por aca como que se invierte el orden. X pasa a ser "Y" y "Y" a X
     private boolean isContinentalAmerica(Coordenada origen, Coordenada destino, int[] americaRows, int[] americaCols) {
         int origenRow = origen.getY();
         int origenCol = origen.getX();

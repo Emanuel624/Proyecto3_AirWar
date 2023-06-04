@@ -32,32 +32,7 @@ import javafx.scene.control.TextArea;
 public class ControladorServer extends Stage {
 
     private static Socket socket;
-
-    private final Aviones Stuka = new Aviones("Stuka",30,4,50);
-    private final Aviones P51 = new Aviones("P51",45,1,40);
-    private final Aviones BF109 = new Aviones("BF109",60,3,10);
-    private final Aviones JU88 = new Aviones("JU88",40,5,60);
-    private final Aviones Spitfire = new Aviones("Spitfire", 70,5,20);
-    private final Aviones Hurricane = new Aviones("Hurricane",75,3,15);
-
-    private final Aviones YAK9 = new Aviones("YAK9",40,2,35);
-
-    /**
-     * metodo que se encarga de insertar los aviones en una lista y devolverla
-     * @return la lista con los aviones
-     */
-    private ListaEnlazada<Aviones> ListaAviones(){
-        ListaEnlazada<Aviones> listaEnlazadaAviones = new ListaEnlazada<>();
-        listaEnlazadaAviones.add(Stuka);
-        listaEnlazadaAviones.add(P51);
-        listaEnlazadaAviones.add(BF109);
-        listaEnlazadaAviones.add(JU88);
-        listaEnlazadaAviones.add(Spitfire);
-        listaEnlazadaAviones.add(Hurricane);
-        listaEnlazadaAviones.add(YAK9);
-
-        return listaEnlazadaAviones;
-    }
+    private TextArea textArea;
 
     public ControladorServer() throws IOException {
         Button button = new Button("¿Hago algo?");
@@ -101,8 +76,8 @@ public class ControladorServer extends Stage {
                             // Actualizar el TextArea en el hilo de la interfaz de usuario
                             Platform.runLater(() -> {
                                 // Obtener la información específica del grafo y agregarla al TextArea
-                                //String informacionGrafo = obtenerInformacionGrafo(grafoRecibido);
-                                //textArea.appendText(informacionGrafo + "\n");
+                                String informacionGrafo = obtenerInformacionGrafo(grafoRecibido);
+                                textArea.appendText(informacionGrafo + "\n");
                             });
                         }
                     } catch (IOException e) {

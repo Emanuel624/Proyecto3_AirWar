@@ -1,6 +1,8 @@
 package Aviones;
 
-
+/**
+ * clase con los metodos y atributos del objeto aviones
+ */
 public class Aviones {
     private final String nombre;
 

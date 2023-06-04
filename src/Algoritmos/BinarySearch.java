@@ -1,5 +1,8 @@
 package Algoritmos;
 
+/**
+ * clase con la logica de BinarySearch para buscar aviones por su nombre
+ */
 public class BinarySearch {
         // Returns index of x if it is present in arr[],
         // else return -1
