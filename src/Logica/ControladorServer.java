@@ -76,8 +76,8 @@ public class ControladorServer extends Stage {
                             // Actualizar el TextArea en el hilo de la interfaz de usuario
                             Platform.runLater(() -> {
                                 // Obtener la información específica del grafo y agregarla al TextArea
-                                String informacionGrafo = obtenerInformacionGrafo(grafoRecibido);
-                                textArea.appendText(informacionGrafo + "\n");
+                                //String informacionGrafo = obtenerInformacionGrafo(grafoRecibido);
+                                //textArea.appendText(informacionGrafo + "\n");
                             });
                         }
                     } catch (IOException e) {

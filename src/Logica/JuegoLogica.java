@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -22,6 +21,7 @@ import Listas.ListaEnlazadaView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -31,6 +31,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 
 import javafx.geometry.Insets;
@@ -46,11 +47,11 @@ public class JuegoLogica extends Stage {
     private ObjectOutputStream out1;
     private final Button[][] gridButtons = new Button[GRID_SIZE_X][GRID_SIZE_Y];
 
-
+    private final String[][] gridData = new String[GRID_SIZE_X][GRID_SIZE_Y]; // Matriz adicional para almacenar los valores
     private static final int GRID_SIZE_X = 10;
     private static final int GRID_SIZE_Y = 17;
 
-    private final Aviones Stuka = new Aviones("Stuka",30,4,50);
+    //private final Aviones Stuka = new Aviones("Stuka",30,4,50);
     private final Aviones P51 = new Aviones("P51",45,1,40);
     private final Aviones BF109 = new Aviones("BF109",60,3,10);
     private final Aviones JU88 = new Aviones("JU88",40,5,60);
@@ -58,6 +59,10 @@ public class JuegoLogica extends Stage {
     private final Aviones Hurricane = new Aviones("Hurricane",75,7,15);
 
     private final Aviones YAK9 = new Aviones("YAK9",41,2,35);
+
+    private final  StackPane layout = new StackPane();
+
+    private final Scene sceneMapa = new Scene(layout, 1550, 800);
 
     //Clasificar si el grid es tierra(true) o agua (false).
     private final boolean[][] TierraMar = {
@@ -100,7 +105,7 @@ public class JuegoLogica extends Stage {
     public JuegoLogica(Stage stage) throws IOException {
         // Configurar los elementos de la interfaz
         setTitle("Ventana del Juego");
-        StackPane layout = new StackPane();
+
         GridPane gridPane = createGridPane(stage);
 
         // Cargar la imagen de fondo
@@ -115,8 +120,7 @@ public class JuegoLogica extends Stage {
 
         
         // Crear una escena y asignarla al escenario
-        Scene scene = new Scene(layout, 1550, 800);
-        setScene(scene);
+        setScene(sceneMapa);
 
         // Iniciar el socket en un nuevo hilo
         Thread socketThread = new Thread(this::iniciarSocket);
@@ -136,7 +140,7 @@ public class JuegoLogica extends Stage {
         Pane container = new Pane(); // Contenedor para las líneas
         container.setMouseTransparent(true); // Hacer el contenedor transparente a los eventos de ratón
         container.setOpacity(1);
-        String[][] gridData = new String[GRID_SIZE_X][GRID_SIZE_Y]; // Matriz adicional para almacenar los valores
+
 
         for (int row = 0; row < GRID_SIZE_X; row++) {
             for (int col = 0; col < GRID_SIZE_Y; col++) {
@@ -224,7 +228,7 @@ public class JuegoLogica extends Stage {
      */
     private ListaEnlazada<Aviones> ListaAviones(){
         ListaEnlazada<Aviones> listaEnlazadaAviones = new ListaEnlazada<>();
-        listaEnlazadaAviones.add(Stuka);
+        //listaEnlazadaAviones.add();
         listaEnlazadaAviones.add(P51);
         listaEnlazadaAviones.add(BF109);
         listaEnlazadaAviones.add(JU88);
@@ -237,13 +241,13 @@ public class JuegoLogica extends Stage {
 
     /**
      * Funcion que se encarga de manejar la logica detras del ordenamiento
-     * @param stage la ventana
+     * @param stageLista la ventana
      * @param event presionar un boton
      * @param row fila de la matriz de botones
      * @param col columna de la matriz de botones
      * @throws Exception exception
      */
-    private void buttonOnClick(Stage stage, MouseEvent event, int row, int col) throws Exception {
+    private void buttonOnClick(Stage stageLista, MouseEvent event, int row, int col) throws Exception {
         if (event.getButton() == MouseButton.SECONDARY && (gridButtons[row][col].getText().equals("X") ||
                 gridButtons[row][col].getText().equals("0"))){
             //crear la listview y setear tamaño
@@ -284,25 +288,19 @@ public class JuegoLogica extends Stage {
             txtNombre.setAlignment(Pos.CENTER);
             Button btnBuscar = new Button("Buscar");
             btnBuscar.setAlignment(Pos.CENTER);
-
-            VBox vboxBtns = new VBox(lbl,btnVelocidad,btnEficiencia, lbl2, txtNombre, btnBuscar);
+            Button btnCrear = new Button("Crear");
+            btnCrear.setAlignment(Pos.CENTER);
+            VBox vboxBtns = new VBox(lbl, btnVelocidad, btnEficiencia, lbl2, txtNombre, btnBuscar, btnCrear);
             vboxBtns.setAlignment(Pos.TOP_CENTER);
             vboxBtns.setSpacing(10);
             vboxBtns.setPadding(new Insets(30));
 
-
-
-
             HBox hbox = new HBox(vboxLbls, vboxBtns);
+
+            final int finalRow = row;
+            final int finalCol = col;
             btnVelocidad.setOnAction(event1 -> {
                     handleBtnVelocidad(listViewAviones.getListView());
-                /*try {
-                    handleServerMessages(listViewAviones);
-                } catch (IOException | ClassNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-
-                 */
             });
             btnEficiencia.setOnAction(event2 -> {
                 handleBtnEficiencia(listViewAviones.getListView());
@@ -310,11 +308,13 @@ public class JuegoLogica extends Stage {
             btnBuscar.setOnAction(event3 ->{
                 handleBtnNombre(txtNombre, listViewAviones.getListView());
             });
+            btnCrear.setOnAction(event4 -> {
+                handleBtnCrear(listViewAviones, finalRow, finalCol);
+            });
 
+            stageLista.setScene(new Scene(hbox, 450, 420)); //TODO: cambiar nombre de stage
 
-            stage.setScene(new Scene(hbox, 450, 420));
-
-            stage.show();
+            stageLista.show();
         }}
 
     /**
@@ -443,21 +443,64 @@ public class JuegoLogica extends Stage {
             }
         }
     }
-    /*
-    private void handleServerMessages (ListView<String> listViewAviones) throws IOException, ClassNotFoundException {
-        Object obj = in.readObject();
+    private void handleBtnCrear (ListaEnlazadaView<Aviones> listViewAviones, int row, int col){
+        double localizacionX =  gridButtons[row][col].getLayoutX(); //coordenadas del boton que hice clic derecho
+        double localizacionY = gridButtons[row][col].getLayoutY();
+        Aviones seleccionado = listViewAviones.getListView().getSelectionModel().getSelectedItem(); //si un avion esta seleccionado
+        if (seleccionado != null){
+            Circle avion = new Circle(10); //circulo con radio 10
+            StackPane circulosAviones = (StackPane) sceneMapa.getRoot(); //stackpane que se crea para mandar el círculo a sceneMapa
+            circulosAviones.getChildren().addAll(avion); //manda el circulo a la pantalla
 
-        if (obj instanceof ObservableList){
-            ObservableList<Aviones> avionesOrdenadosVelocidad = (ObservableList<Aviones>) obj;
-            listViewAviones.getItems().clear();
-            for (Aviones avion :avionesOrdenadosVelocidad) {
-                listViewAviones.getItems().add(avion.nombre());
-            }
+            avion.setFill(Color.DARKRED);
+            avion.setOpacity(1);
+
+            avion.setTranslateX(localizacionX); //no sirve bajo esta logica.
+            avion.setTranslateY(localizacionY); //Deberia de poner el circulo en [row][col] donde hice clic derecho
+
+            //avion.setLayoutX(localizacionX); //si se pone en vez de translate, el circulo se crea en el medio siempre
+            //avion.setLayoutY(localizacionY);
+            //StackPane.setAlignment(avion, Pos.CENTER);
+            //StackPane.setMargin(avion, new Insets(localizacionX, 0, 0, localizacionY)); //igual acá, se crea en el centro
+            //layout.getChildren().add(avion);
+
+
         }
-
-
+        out.println(localizacionX);
+        out.println(localizacionY);
     }
-     */
+
+//OTRA MANERA DE IMPLEMENTARLO TOMANDO EN CUENTA LAS COORDENADAS DE CADA VERTICE (botones). No funciona tampoco
+
+    /*
+    private void handleBtnCrear (ListaEnlazadaView<Aviones> listViewAviones, int row, int col){
+        List<Coordenada> vertices = grafo.obtenerVertices();
+        for (Coordenada vertice : vertices) {
+            double x = vertice.getX();
+            double y = vertice.getY();
+            Aviones seleccionado = listViewAviones.getListView().getSelectionModel().getSelectedItem();
+            if (seleccionado != null){
+                Circle avion = new Circle(10);
+                StackPane circulosAviones = (StackPane) sceneMapa.getRoot();
+                circulosAviones.getChildren().addAll(avion);
+
+                avion.setFill(Color.DARKRED);
+                avion.setOpacity(1);
+
+                avion.setTranslateX(x); //no sirve bajo esta logica
+                avion.setTranslateY(y);
+
+
+                //StackPane.setAlignment(avion, Pos.CENTER);
+                //StackPane.setMargin(avion, new Insets(localizacionX, 0, 0, localizacionY));
+                //layout.getChildren().add(avion);
+            }
+            out.println(x);
+            out.println(y);
+        }
+    }
+
+ */
     private Grafo<String> createGraphFromGridData(String[][] gridData) {
         int rows = gridData.length;
         int cols = gridData[0].length;

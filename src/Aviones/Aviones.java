@@ -23,7 +23,6 @@ public class Aviones {
     }
     public int getVelocidad(){
         return velocidad;
-
     }
     public int getEficiencia() {
         return eficiencia;
