@@ -1,8 +1,11 @@
 package Listas;
 
 import java.util.Arrays;
-import java.util.List;
 
+/**
+ * Clase pública permite generar una Lista de Arrays.
+ * @param <E> datos que se puede agregar a esta lista.
+ */
 public class ArrayListaString<E> {
     private transient int size = 0;
     private String[] elements;
@@ -11,7 +14,6 @@ public class ArrayListaString<E> {
      * Clase ArrayListaString que crea un array de strings especificamente
      */
     public ArrayListaString() {
-
         elements = new String[15];
     }
 
@@ -22,6 +24,7 @@ public class ArrayListaString<E> {
         int newSize = elements.length * 2;
         elements = Arrays.copyOf(elements, newSize);
     }
+    
     /**
      * El metodo add, permite añadir elementos (strings) al arrayLista.
      * @param e este parametro es la información que se decia añadir en dicha array Lista.
@@ -48,13 +51,12 @@ public class ArrayListaString<E> {
     public int size() {
         return this.size;
     }
+    
+    /**
+     * Objeto público que permite pasar la lista a "Arrays".
+     * @return una copia de dicha lista en el nuevo formato.
+     */
     public Object[] toArray() {
         return Arrays.copyOf(elements, size);
     }
-    /*
-    public void set(int index, E element) {
-        elements[index] = (String) element;
-    }
-
-     */
 }

@@ -9,18 +9,15 @@ import java.util.*;
 
 import Algoritmos.BinarySearch;
 import Algoritmos.InsertionSort;
-import Algoritmos.SortArray;
 import Algoritmos.ShellSort;
 import Aviones.Aviones;
 import Listas.ArrayLista;
-import Listas.ArrayListaString;
 import Listas.ListaEnlazada;
 
 import Listas.ListaEnlazadaView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -39,7 +36,9 @@ import javafx.scene.shape.Line;
 
 import static java.lang.System.out;
 
-
+/**
+ * Clase pública relacionada la lógica del juego AirWar como tal.
+ */
 public class JuegoLogica extends Stage {
     private ObjectInputStream in;
 
@@ -79,7 +78,9 @@ public class JuegoLogica extends Stage {
     
     private Grafo<String> grafo;
 
-
+    /**
+     * Método privado que permite iniciar la comunicación de Sockets.
+     */
     private void iniciarSocket() {
         try {
             // Crear el socket para conectarse al servidor
@@ -101,6 +102,11 @@ public class JuegoLogica extends Stage {
         }
     }
     
+    /**
+     * Inicializador de la clase JuegoLógica.
+     * @param stage parámetro relacionado la interfaz gráfica como tal.
+     * @throws IOException exepción en caso de error con la comunicación serial.
+     */
     public JuegoLogica(Stage stage) throws IOException {
         // Configurar los elementos de la interfaz
         setTitle("Ventana del Juego");
@@ -108,7 +114,7 @@ public class JuegoLogica extends Stage {
         GridPane gridPane = createGridPane(stage);
 
         // Cargar la imagen de fondo
-        Image imagenFondo = new Image("file:D:\\TEC\\Datos I\\Proyecto\\Proyecto3_AirWar\\MapaMundoProyecto3.png");
+        Image imagenFondo = new Image("file:///C:/Users/Extreme PC/Desktop/Proyecto3_AirWar/MapaMundoProyecto3.png");
         BackgroundSize backgroundSize = new BackgroundSize(1.0, 1.0, false, true, true, true);
         BackgroundImage fondo = new BackgroundImage(imagenFondo, BackgroundRepeat.NO_REPEAT,
                 BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, backgroundSize);
@@ -128,7 +134,11 @@ public class JuegoLogica extends Stage {
 
     }
     
-    
+    /**
+     * GridPane privado que se encarga de la creación de la matriz y del GUI.
+     * @param stage1 escenario donde se crea este GridPane.
+     * @return retorna el gridPane
+     */
     private GridPane createGridPane(Stage stage1) {
 
         GridPane gridPane = new GridPane();
@@ -222,8 +232,8 @@ public class JuegoLogica extends Stage {
     }
 
     /**
-     * metodo que guarda los aviones previamente definidos
-     * @return esa lista con los aviones
+     * metodo que guarda los aviones previamente definidos.
+     * @return esa lista con los aviones.
      */
     private ListaEnlazada<Aviones> ListaAviones(){
         ListaEnlazada<Aviones> listaEnlazadaAviones = new ListaEnlazada<>();
@@ -239,12 +249,12 @@ public class JuegoLogica extends Stage {
     }
 
     /**
-     * Funcion que se encarga de manejar la logica detras del ordenamiento
-     * @param stageListaConAviones la ventana
-     * @param event presionar un boton
-     * @param row fila de la matriz de botones
-     * @param col columna de la matriz de botones
-     * @throws Exception exception
+     * Funcion que se encarga de manejar la logica detras del ordenamiento.
+     * @param stageListaConAviones la ventana.
+     * @param event presionar un boton.
+     * @param row fila de la matriz de botones.
+     * @param col columna de la matriz de botones.
+     * @throws Exception exception excepción en caso de problemas con los sockets.
      */
     private void buttonOnClick(Stage stageListaConAviones, MouseEvent event, int row, int col) throws Exception {
         if (event.getButton() == MouseButton.SECONDARY && (gridButtons[row][col].getText().equals("X") ||
@@ -317,8 +327,8 @@ public class JuegoLogica extends Stage {
         }}
 
     /**
-     * metodo que permite organizar los aviones en la listView por su velocidad
-     * @param listViewAviones la listView de aviones
+     * Metodo que permite organizar los aviones en la listView por su velocidad.
+     * @param listViewAviones la listView de aviones.
      */
     private void handleBtnVelocidad (ListView<Aviones> listViewAviones){
        /*
@@ -361,8 +371,8 @@ public class JuegoLogica extends Stage {
     }
 
     /**
-     * Metodo que se encarga de ordenar la listView por la eficiencia
-     * @param listViewAviones la listView de aviones
+     * Metodo que se encarga de ordenar la listView por la eficiencia.
+     * @param listViewAviones la listView de aviones.
      */
     private void handleBtnEficiencia (ListView<Aviones> listViewAviones){
         /*try {
@@ -400,11 +410,11 @@ public class JuegoLogica extends Stage {
             }
         }
     }
-
+    
     /**
-     * Método que permite buscar por nombre de avion
-     * @param txtNombre el campo de texto de la ventana
-     * @param listViewAviones la listView de aviones
+     * Método que permite buscar por nombre de avion.
+     * @param txtNombre el campo de texto de la ventana.
+     * @param listViewAviones la listView de aviones.
      */
     private void handleBtnNombre (TextField txtNombre, ListView<Aviones> listViewAviones){
         ListaEnlazada<Aviones> listaAviones = ListaAviones();
@@ -452,6 +462,13 @@ public class JuegoLogica extends Stage {
             }
         }
     }
+    
+    /**
+     * Método que permite crear aviones.
+     * @param listViewAviones listView de los aviones.
+     * @param row fila donde se esperan crear crear los aviones
+     * @param col columna donde se espearan crear los aviones.
+     */
     private void handleBtnCrear (ListaEnlazadaView<Aviones> listViewAviones, int row, int col){
         double localizacionX =  gridButtons[row][col].getLayoutX(); //coordenadas del boton que hice clic derecho
         double localizacionY = gridButtons[row][col].getLayoutY();
@@ -510,6 +527,12 @@ public class JuegoLogica extends Stage {
     }
 
  */
+    
+    /**
+     * Grafo privado que crea el grafo en base de la matriz de botones.
+     * @param gridData el gridData creado.
+     * @return el grafo como tal.
+     */
     private Grafo<String> createGraphFromGridData(String[][] gridData) {
         int rows = gridData.length;
         int cols = gridData[0].length;
@@ -590,7 +613,16 @@ public class JuegoLogica extends Stage {
 
         return grafo;
     }
-    //al parecer, por aca como que se invierte el orden. X pasa a ser "Y" y "Y" a X
+
+    
+    /**
+     * Permite dicernir en que lugar se genera el aeropuerto / portaaviones.
+     * @param origen Coordenada de origen.
+     * @param destino Coordenada de destino.
+     * @param americaRows Coordena que define america en fila.
+     * @param americaCols Coordenad que define america en columna.
+     * @return si pertence o no al parametro.
+     */
     private boolean isContinentalAmerica(Coordenada origen, Coordenada destino, int[] americaRows, int[] americaCols) {
         int origenRow = origen.getY();
         int origenCol = origen.getX();
@@ -616,7 +648,15 @@ public class JuegoLogica extends Stage {
 
         return (origenEnAmerica && destinoEnAmerica);
     }
-   
+    
+    /**
+     * Permite dicernir en que lugar se genera el aeropuerto / portaaviones.
+     * @param origen Coordenada de origen.
+     * @param destino Coordenada de destino.
+     * @param africaEuropaRows Coordena que define AfricaEuropa en fila.
+     * @param africaEuropaCols Coordenad que define AfricaEuropa en columna.
+     * @return si pertence o no al parametro.
+     */
     private boolean isContinentalEuAfrica(Coordenada origen, Coordenada destino, int[] africaEuropaRows, int[] africaEuropaCols) {
         int origenRow = origen.getY();
         int origenCol = origen.getX();
@@ -643,6 +683,14 @@ public class JuegoLogica extends Stage {
         return (origenEnEuAfrica && destinoEnEuAfrica);
     }
     
+    /**
+     * Permite dicernir en que lugar se genera el aeropuerto / portaaviones.
+     * @param origen coordeana de origen del vertice.
+     * @param destino coordeana de destino del vertice.
+     * @param asiaOceaniaRows Coordena que define asiaOceania en fila. 
+     * @param asiaOceaniaCols Coordenad que define asiaOceania en columna.
+     * @return retorna el tipo de conexión como tal.
+     */
     private boolean isContinentalAsiaOcea(Coordenada origen, Coordenada destino, int[] asiaOceaniaRows, int[] asiaOceaniaCols) {
         int origenRow = origen.getY();
         int origenCol = origen.getX();
@@ -668,7 +716,13 @@ public class JuegoLogica extends Stage {
         return (origenEnAsiaOcea && destinoEnAsiaOcea);
     }
 
-        
+    /**
+     * double privado que permite calcularDistancia entre vertices.
+     * @param origen Coordenada de origen.
+     * @param destino Coordenada de desitino.
+     * @param gridData el dato de la matriz de la adyacencia.
+     * @return retorna la distancia como tal.
+     */    
     private double calcularDistancia(Coordenada origen, Coordenada destino, String[][] gridData) {
         int x1 = origen.getY();
         int y1 = origen.getX();
@@ -690,6 +744,10 @@ public class JuegoLogica extends Stage {
 
         return (double) Math.round(distancia);
     }
+    
+    /**
+     * Método que permite desplegar la GUI como tal.
+     */
     public void display() {
         // Mostrar la interfaz
         show();

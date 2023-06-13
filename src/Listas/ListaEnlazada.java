@@ -2,7 +2,6 @@ package Listas;
 
 
 import java.util.function.Consumer;
-import java.io.Serializable;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 

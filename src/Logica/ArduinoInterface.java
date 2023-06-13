@@ -1,9 +1,16 @@
 import com.fazecast.jSerialComm.*;
 import java.util.Scanner;
 
+/**
+ * Clase utilizada para generar la interfaz serial entre computador y la plataforma arduino UNO.
+ */
 public class ArduinoInterface {
     private static SerialPort chosenPort;
-
+    
+    /**
+     * Método estático main el cual permite la ejecución de la clase como tal.
+     * @param args parametro necesario para la ejecución del main
+     */
     public static void main(String[] args) {
         SerialPort[] portNames = SerialPort.getCommPorts();
         for (int i = 0; i < portNames.length; i++)
@@ -36,11 +43,17 @@ public class ArduinoInterface {
             System.out.println("No se encontró el puerto COM5.");
         }
     }
-
+    
+    /**
+     * Método estático para saber si se acerto a la LED central
+     */
     public static void printSuccess() {
         System.out.println("Acertaste");
     }
-
+    
+    /**
+     * Método estático para saber si falló a la LED central
+     */
     public static void printFailure() {
         System.out.println("Fallaste");
     }

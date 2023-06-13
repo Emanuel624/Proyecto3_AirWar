@@ -5,18 +5,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import Algoritmos.InsertionSort;
-import Algoritmos.ShellSort;
-import Aviones.Aviones;
-import Listas.ArrayLista;
-import Listas.ListaEnlazada;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -25,22 +17,29 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 
+/**
+ * Clase relacionado al Controlador junto con el servidor del programar.
+ */
 public class ControladorServer extends Stage {
 
     private static Socket socket;
     private TextArea textArea;
-
+    
+    /**
+     * Inicializador de la clase ControladorSever.
+     * @throws IOException en caso de error con la conexión serial del servidor.
+     */
     public ControladorServer() throws IOException {
         Button button = new Button("¿Hago algo?");
         Label label = new Label("¡Bienvenidos al Controlador!");
 
+        textArea = new TextArea();
+        textArea.setEditable(false);
         
         // Crear un contenedor para todos los nodos
-        VBox vbox = new VBox(button, label);
+        VBox vbox = new VBox(button, label, textArea);
         vbox.setSpacing(10);
         vbox.setAlignment(Pos.CENTER);
         vbox.setPadding(new Insets(20));
@@ -76,8 +75,8 @@ public class ControladorServer extends Stage {
                             // Actualizar el TextArea en el hilo de la interfaz de usuario
                             Platform.runLater(() -> {
                                 // Obtener la información específica del grafo y agregarla al TextArea
-                                //String informacionGrafo = obtenerInformacionGrafo(grafoRecibido);
-                                //textArea.appendText(informacionGrafo + "\n");
+                                String informacionGrafo = obtenerInformacionGrafo(grafoRecibido);
+                                textArea.appendText(informacionGrafo + "\n");
                             });
                         }
                     } catch (IOException e) {
@@ -91,7 +90,13 @@ public class ControladorServer extends Stage {
                 e.printStackTrace();
             }
         }
-        // Método para obtener la información específica del grafo
+    
+
+        /**
+         * Método para obtener la información recibida por sockets y que sea leida y mostrada de una forma facil de interpretar.
+         * @param grafo recibe el grafo enviado por sockets
+         * @return la información como tal en un nuevo formato.
+         */
         private String obtenerInformacionGrafo(Grafo grafo) {
             StringBuilder sb = new StringBuilder();
 
@@ -121,7 +126,9 @@ public class ControladorServer extends Stage {
         }
 
 
-
+    /**
+     * Método que permite ejectuar esta interfaz de JavaFX.
+     */    
     public void display() {
         // Mostrar la interfaz desde el hilo de la interfaz de usuario
         Platform.runLater(this::show);
