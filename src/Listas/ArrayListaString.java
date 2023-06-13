@@ -1,8 +1,9 @@
 package Listas;
 
 import java.util.Arrays;
+import java.util.List;
 
-public class ArrayListaString<E>  {
+public class ArrayListaString<E> {
     private transient int size = 0;
     private String[] elements;
 
@@ -47,4 +48,13 @@ public class ArrayListaString<E>  {
     public int size() {
         return this.size;
     }
+    public Object[] toArray() {
+        return Arrays.copyOf(elements, size);
+    }
+    /*
+    public void set(int index, E element) {
+        elements[index] = (String) element;
+    }
+
+     */
 }

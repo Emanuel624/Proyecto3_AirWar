@@ -5,12 +5,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 import Algoritmos.BinarySearch;
 import Algoritmos.InsertionSort;
+import Algoritmos.SortArray;
 import Algoritmos.ShellSort;
 import Aviones.Aviones;
 import Listas.ArrayLista;
@@ -241,13 +240,13 @@ public class JuegoLogica extends Stage {
 
     /**
      * Funcion que se encarga de manejar la logica detras del ordenamiento
-     * @param stageLista la ventana
+     * @param stageListaConAviones la ventana
      * @param event presionar un boton
      * @param row fila de la matriz de botones
      * @param col columna de la matriz de botones
      * @throws Exception exception
      */
-    private void buttonOnClick(Stage stageLista, MouseEvent event, int row, int col) throws Exception {
+    private void buttonOnClick(Stage stageListaConAviones, MouseEvent event, int row, int col) throws Exception {
         if (event.getButton() == MouseButton.SECONDARY && (gridButtons[row][col].getText().equals("X") ||
                 gridButtons[row][col].getText().equals("0"))){
             //crear la listview y setear tamaño
@@ -312,9 +311,9 @@ public class JuegoLogica extends Stage {
                 handleBtnCrear(listViewAviones, finalRow, finalCol);
             });
 
-            stageLista.setScene(new Scene(hbox, 450, 420)); //TODO: cambiar nombre de stage
+            stageListaConAviones.setScene(new Scene(hbox, 450, 420));
 
-            stageLista.show();
+            stageListaConAviones.show();
         }}
 
     /**
@@ -408,34 +407,44 @@ public class JuegoLogica extends Stage {
      * @param listViewAviones la listView de aviones
      */
     private void handleBtnNombre (TextField txtNombre, ListView<Aviones> listViewAviones){
-        /*try {
-            out1.writeObject("buscarNombre");
-        }catch (IOException e){
-            e.printStackTrace();
+        ListaEnlazada<Aviones> listaAviones = ListaAviones();
+        //ArrayListaString<String> arrayNombres = new ArrayListaString<>();
+        //ArrayListaString<String> arrayNombres2 = new ArrayListaString<>();
+
+        //iterar sobre la lista de aviones y añadir cada avión a un array
+        ArrayList<String> arrayNombres = new ArrayList<>();
+        String nombreBuscado = txtNombre.getText();
+        for (Aviones aviones : listaAviones) {
+            //arrayNombres.addString(aviones.getNombre());
+            arrayNombres.add(aviones.getNombre());
+        }
+        /*
+        for (Aviones aviones : listaAviones){
+            //arrayNombres2.addString(aviones.getNombre());
+            arrayNombres2.add(aviones.getNombre());
         }
 
          */
-        ListaEnlazada<Aviones> listaAviones = ListaAviones();
-        ArrayListaString<String> arrayNombres = new ArrayListaString<>();
-        String nombreBuscado = txtNombre.getText();
-        for (Aviones aviones : listaAviones) {
-            arrayNombres.addString(aviones.getNombre());
-        }
-        //crear un int [] para almacenar las velocidades
-        String[] arrayNombres2 = new String[arrayNombres.size()];
         for (int i = 0; i < arrayNombres.size(); i++) {
-            arrayNombres2[i] = arrayNombres.get(i);
+            arrayNombres.set(i, arrayNombres.get(i));
         }
+        //String[] arrayNombres2Array = new String[arrayNombres2.size()];
+        //arrayNombres2Array = (String[]) arrayNombres2.toArray();
+        //InsertionSortArray.sort_sub(arrayNombres2Array, arrayNombres2Array.length);
+
+        //ordenar el array ya que binary search solo funciona así
+        Collections.sort(arrayNombres);
         ObservableList<Aviones> avionesEncontrados= FXCollections.observableArrayList();
-        int indice = BinarySearch.binarySearch(arrayNombres2, nombreBuscado);
+        int indice = BinarySearch.binarySearch(arrayNombres, nombreBuscado);
         if (indice >= 0){
-            String nombreEncontrado = arrayNombres2[indice];
+            String nombreEncontrado = arrayNombres.get(indice);
             for (Aviones avion : listaAviones) {
                 if (Objects.equals(avion.getNombre(), nombreEncontrado)) {
                     avionesEncontrados.add(avion);
                     break;
                 }
             }
+            //desplegar en la listView
         listViewAviones.getItems().clear();;
         txtNombre.clear();
         for (Aviones avion :avionesEncontrados) {
