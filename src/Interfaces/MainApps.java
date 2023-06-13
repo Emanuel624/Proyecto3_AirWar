@@ -24,4 +24,3 @@ public class MainApps extends Application {
         Controlador.display();
     }
 }
-
