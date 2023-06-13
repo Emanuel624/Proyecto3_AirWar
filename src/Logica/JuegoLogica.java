@@ -481,8 +481,8 @@ public class JuegoLogica extends Stage {
             avion.setFill(Color.DARKRED);
             avion.setOpacity(1);
 
-            avion.setTranslateX(localizacionX); //no sirve bajo esta logica.
-            avion.setTranslateY(localizacionY); //Deberia de poner el circulo en [row][col] donde hice clic derecho
+            avion.setLayoutX(localizacionX); //no sirve bajo esta logica.
+            avion.setLayoutY(localizacionY); //Deberia de poner el circulo en [row][col] donde hice clic derecho
 
             //avion.setLayoutX(localizacionX); //si se pone en vez de translate, el circulo se crea en el medio siempre
             //avion.setLayoutY(localizacionY);

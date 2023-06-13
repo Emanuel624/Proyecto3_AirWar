@@ -18,7 +18,7 @@ public class ArduinoInterface {
                 chosenPort = portNames[i];
                 break;
             }
-
+        
         if (chosenPort != null) {
             chosenPort.openPort();
             chosenPort.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);

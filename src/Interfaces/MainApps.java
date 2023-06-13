@@ -21,7 +21,7 @@ public class MainApps extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-
+    
     @Override
     /**
      * Método encargado de iniciar la aplicación GUI como tal.
