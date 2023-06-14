@@ -1,7 +1,7 @@
-const int leds[] = {3, 4, 5, 6, 7}; // reemplaza estos números con los pines donde conectaste los LEDs
+const int leds[] = {3, 4, 5, 6, 7}; 
 bool ledStates[] = {false, false, false, false, false}; // estado de los LEDs
-const int btnPin = 2; // el pin donde conectaste el botón
-const int buzzerPin = 8; // el pin donde conectaste el buzzer
+const int btnPin = 2; 
+const int buzzerPin = 8; 
 int ledIndex = 0;
 int direction = 1;
 unsigned long lastDebounceTime = 0;
