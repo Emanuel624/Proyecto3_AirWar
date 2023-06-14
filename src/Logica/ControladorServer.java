@@ -25,7 +25,7 @@ import javafx.scene.control.TextArea;
 public class ControladorServer extends Stage {
 
     private static Socket socket;
-    private TextArea textArea;
+    private final TextArea textArea;
     
     /**
      * Inicializador de la clase ControladorSever.

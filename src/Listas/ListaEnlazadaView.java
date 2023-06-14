@@ -5,7 +5,6 @@ import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListView;
-
 /**
  * Clase pública, que conllvea la implementación de una forma de visualizar la clase ListaEnlazada de una forma amigable con el usuario.
  * @authors Randall Bryan Bolañoz López, Octavio Sanchez Soto, Emanuel Chavarría Hernández.

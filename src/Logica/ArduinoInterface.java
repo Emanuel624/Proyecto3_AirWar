@@ -1,3 +1,5 @@
+package Logica;
+
 import com.fazecast.jSerialComm.*;
 import java.util.Scanner;
 

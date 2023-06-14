@@ -49,7 +49,7 @@ public class JuegoLogica extends Stage {
     private static final int GRID_SIZE_X = 10;
     private static final int GRID_SIZE_Y = 17;
 
-    //private final Aviones Stuka = new Aviones("Stuka",30,4,50);
+    private final Aviones Stuka = new Aviones("Stuka",30,4,50);
     private final Aviones P51 = new Aviones("P51",45,1,40);
     private final Aviones BF109 = new Aviones("BF109",60,3,10);
     private final Aviones JU88 = new Aviones("JU88",40,5,60);
@@ -237,7 +237,7 @@ public class JuegoLogica extends Stage {
      */
     private ListaEnlazada<Aviones> ListaAviones(){
         ListaEnlazada<Aviones> listaEnlazadaAviones = new ListaEnlazada<>();
-        //listaEnlazadaAviones.add();
+        listaEnlazadaAviones.add(Stuka);
         listaEnlazadaAviones.add(P51);
         listaEnlazadaAviones.add(BF109);
         listaEnlazadaAviones.add(JU88);
@@ -331,14 +331,7 @@ public class JuegoLogica extends Stage {
      * @param listViewAviones la listView de aviones.
      */
     private void handleBtnVelocidad (ListView<Aviones> listViewAviones){
-       /*
-        try {
-            out1.writeObject("velocidad");
-        }catch (IOException e){
-            e.printStackTrace();
-        }
 
-        */
         ListaEnlazada<Aviones> listaAviones = ListaAviones();
         ArrayLista<Integer> arrayVelocidades = new ArrayLista<>();
 
@@ -346,22 +339,28 @@ public class JuegoLogica extends Stage {
             arrayVelocidades.add(aviones.getVelocidad());
         }
         //crear un int [] para almacenar las velocidades
-        int[] arrayVelocidades2 = new int[arrayVelocidades.size()];
+        int[] arrayVelocidadesEnteros = new int[arrayVelocidades.size()];
         for (int i = 0; i < arrayVelocidades.size(); i++) {
-            arrayVelocidades2[i] = arrayVelocidades.get(i);
-        }
-        //ordenar las velocidades del int[] con insertion sort
-        InsertionSort.insertionSort(arrayVelocidades2);
+            arrayVelocidadesEnteros[i] = arrayVelocidades.get(i);
+        } //se itera sobre cada elemento del arrayVelocidades y
+        // se asigna el valor de cada índice all array de enteros de velocidades
 
-        //
+
+        //ordenar las velocidades del int[] con insertion sort
+        InsertionSort.insertionSort(arrayVelocidadesEnteros);
+
+        //por cada valor de eficiencia en arrayEficienciasEnteros,
+        // se itera sobre cada avión de la lista de aviones y si la eficiencia de estos es igual a la ya ordenada,
+        // se añade a la lista
         ObservableList<Aviones> avionesOrdenadosVelocidad = FXCollections.observableArrayList();
-        for (int velocidad : arrayVelocidades2) {
+        for (int velocidad : arrayVelocidadesEnteros) {
             for (Aviones avion : listaAviones) {
                 if (avion.getVelocidad() == velocidad) {
                     avionesOrdenadosVelocidad.add(avion);
                     break;
                 }
             }
+            //se despliega esa lista en la listView
             listViewAviones.getItems().clear();
             for (Aviones avion :avionesOrdenadosVelocidad) {
                 listViewAviones.getItems().add(avion);
@@ -375,13 +374,6 @@ public class JuegoLogica extends Stage {
      * @param listViewAviones la listView de aviones.
      */
     private void handleBtnEficiencia (ListView<Aviones> listViewAviones){
-        /*try {
-            out1.writeObject("fortaleza");
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-
-         */
         ListaEnlazada<Aviones> listaAviones = ListaAviones();
         ArrayLista<Integer> arrayEficiencias = new ArrayLista<>();
 
@@ -389,15 +381,19 @@ public class JuegoLogica extends Stage {
             arrayEficiencias.add(aviones.getEficiencia());
         }
         //crear un int [] para almacenar las velocidades
-        int[] arrayEficiencias2 = new int[arrayEficiencias.size()];
+        int[] arrayEficienciasEnteros = new int[arrayEficiencias.size()];
         for (int i = 0; i < arrayEficiencias.size(); i++) {
-            arrayEficiencias2[i] = arrayEficiencias.get(i);
-        }
-        //ordenar las fortalezas del int[] con shell sort
-        ShellSort.shellSort(arrayEficiencias2);
-        //
+            arrayEficienciasEnteros[i] = arrayEficiencias.get(i);
+        }//iterar sobre los elementos del arrayEficiencias y asignar el valor del indice actual al array de enteros
+
+        //ordenar las eficiencias del int[] con shell sort
+        ShellSort.shellSort(arrayEficienciasEnteros);
+
+        //por cada valor de eficiencia en arrayEficienciasEnteros,
+        // se itera sobre cada avión de la lista de aviones y si la eficiencia de estos es igual a la ya ordenada,
+        // se añade a la lista
         ObservableList<Aviones> avionesOrdenadosEficiencia = FXCollections.observableArrayList();
-        for (int eficiencia : arrayEficiencias2) {
+        for (int eficiencia : arrayEficienciasEnteros) {
             for (Aviones avion : listaAviones) {
                 if (avion.getEficiencia() == eficiencia) {
                     avionesOrdenadosEficiencia.add(avion);
@@ -410,7 +406,7 @@ public class JuegoLogica extends Stage {
             }
         }
     }
-    
+
     /**
      * Método que permite buscar por nombre de avion.
      * @param txtNombre el campo de texto de la ventana.
@@ -435,9 +431,6 @@ public class JuegoLogica extends Stage {
         }
 
          */
-        for (int i = 0; i < arrayNombres.size(); i++) {
-            arrayNombres.set(i, arrayNombres.get(i));
-        }
         //String[] arrayNombres2Array = new String[arrayNombres2.size()];
         //arrayNombres2Array = (String[]) arrayNombres2.toArray();
         //InsertionSortArray.sort_sub(arrayNombres2Array, arrayNombres2Array.length);
@@ -446,19 +439,19 @@ public class JuegoLogica extends Stage {
         Collections.sort(arrayNombres);
         ObservableList<Aviones> avionesEncontrados= FXCollections.observableArrayList();
         int indice = BinarySearch.binarySearch(arrayNombres, nombreBuscado);
-        if (indice >= 0){
+        if (indice >= 0){ //significa que se encontró el avión si el indice es mayor o igual a 0
             String nombreEncontrado = arrayNombres.get(indice);
             for (Aviones avion : listaAviones) {
-                if (Objects.equals(avion.getNombre(), nombreEncontrado)) {
+                if (Objects.equals(avion.getNombre(), nombreEncontrado)) { //si el nombre buscado es igual al de un avión, se añade a la lista
                     avionesEncontrados.add(avion);
-                    break;
+                    break; //
                 }
             }
             //desplegar en la listView
-        listViewAviones.getItems().clear();;
-        txtNombre.clear();
-        for (Aviones avion :avionesEncontrados) {
-            listViewAviones.getItems().add(avion);
+            listViewAviones.getItems().clear();;
+            txtNombre.clear();
+            for (Aviones avion :avionesEncontrados) {
+                listViewAviones.getItems().add(avion);
             }
         }
     }
@@ -578,15 +571,15 @@ public class JuegoLogica extends Stage {
                                 }else if (isContinentalAsiaOcea(coordenada, destino, asiaOceaniaCols, asiaOceaniaRows)) {
                                     edgeType = "ContinentalAsiaOcea";
                                 }else{
-                                    distancia += 10; // Increase the weight by 10 (adjust the value as needed)
-                                }
-                                                              
-                                // Increase the weight if the destination node contains "0"
-                                if (otherValue.equals("0")) {
-                                    distancia += 10; // Increase the weight by 10 (adjust the value as needed)
+                                    distancia += 10; // Incrementar el peso por 10
                                 }
 
-                                // Generate a random number between 0 and 1
+                                // Incrementar el peso si el destino es un 0 (portaaviones)
+                                if (otherValue.equals("0")) {
+                                    distancia += 10; // Incrementar el peso por 10
+                                }
+
+                                // Num random entre 0 y 1 para agregar una arista a un nodo
                                 double randomValue = random.nextDouble();
                                 if (randomValue < 0.5) {
                                     grafo.agregarArista(coordenada, destino, distancia, edgeType);
